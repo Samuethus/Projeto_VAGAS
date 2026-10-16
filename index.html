@@ -144,10 +144,13 @@
   .vcard-img img{width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease;}
   .vcard-img:hover img{transform:scale(1.04);}
   .vcard h3{font-size:21px; margin-top:22px;}
-  /* Descrição justificada na largura da imagem, limitada a 3 linhas. */
+  /* Descrição justificada na largura da imagem: reserva 3 linhas e corta em 4.
+     A hifenização (pt-BR) quebra palavras longas e evita espaços grandes entre as palavras. */
   .vcard p{
     color:var(--text-muted); font-size:14px; line-height:1.6; margin:8px 0 22px; width:100%; padding:0 6px;
-    text-align:justify; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden;
+    min-height:calc(3 * 1.6em); max-height:calc(4 * 1.6em);
+    text-align:justify; text-justify:inter-word; hyphens:auto; -webkit-hyphens:auto; overflow-wrap:break-word;
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; line-clamp:4; overflow:hidden;
   }
   .vcard .btn{margin-top:auto; min-width:min(220px,100%); height:46px; background:var(--sidebar-bg); color:#fff; box-shadow:0 10px 22px -12px rgba(2,43,83,.7);}
   .vcard .btn:hover{background:var(--azul-royal);}
