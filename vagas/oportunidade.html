@@ -138,45 +138,135 @@
   .wa-card{background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.04);}
   .wa-table-wrap{overflow-x:auto;}
   .wa-table{width:100%; border-collapse:collapse; text-align:left; font-size:13px; color:var(--wa-text-muted);}
-  .wa-table td{padding:14px 20px;}
+  .wa-table th{
+    padding:12px 20px; background:#F8FAFC; border-bottom:1px solid var(--wa-border);
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap;
+  }
+  .wa-table td{padding:14px 20px; vertical-align:middle; white-space:nowrap;}
+  .wa-table tbody tr + tr td{border-top:1px solid #EEF2F6;}
   .wa-empty-row td{padding:36px 20px; text-align:center; color:#94a3b8; font-size:13px;}
+  /* Coluna do botão fixa à direita: no celular a tabela rola e o "Candidatar-se" continua à vista. */
+  .wa-table .col-acao{position:sticky; right:0; background:var(--wa-card); text-align:right; width:1%;}
+  .wa-table th.col-acao{background:#F8FAFC;}
 
-  /* Calendário (carrossel com 2 meses lado a lado), sem eventos por enquanto. */
-  .wa-cal-carousel-card{padding:16px; overflow:visible;}
-  .wa-cal-carousel{display:flex; align-items:center; gap:10px;}
-  .wa-cal-nav{
-    flex:0 0 auto; background:var(--wa-card); border:1px solid var(--wa-border); border-radius:10px;
-    padding:8px; box-shadow:0 1px 3px rgba(0,0,0,.08); position:sticky; top:88px; z-index:2;
+  .vaga-cargo{font-size:13.5px; font-weight:700; color:var(--wa-text);}
+  .vaga-sub{margin-top:2px; font-size:12px; color:var(--wa-text-muted);}
+  .tag{display:inline-block; padding:3px 10px; border-radius:999px; background:var(--wa-primary-soft); color:var(--wa-primary); font-size:11.5px; font-weight:600; white-space:nowrap;}
+  .tag-verde{background:#E7F8F0; color:#00875A;}
+
+  /* Botão de destaque "Candidatar-se" */
+  .btn-candidatar{
+    display:inline-flex; align-items:center; justify-content:center; gap:7px;
+    padding:9px 16px; border:none; border-radius:10px; cursor:pointer;
+    background:var(--gradiente); color:#fff; font:600 13px 'Inter',sans-serif; white-space:nowrap;
+    box-shadow:0 6px 16px -8px rgba(0,80,162,.7); transition:transform .15s ease, box-shadow .15s ease;
   }
-  .wa-cal-nav svg{width:18px; height:18px; stroke-width:2.4;}
-  .wa-cal-months{display:flex; flex:1; gap:24px; min-width:0; align-items:stretch;}
-  .wa-cal-month-panel{
-    flex:1 1 0; min-width:0; display:flex; flex-direction:column;
-    border:1px solid #EEF2F6; border-radius:10px; overflow:hidden;
+  .btn-candidatar:hover{transform:translateY(-1px); box-shadow:0 10px 20px -10px rgba(0,80,162,.85);}
+  .btn-candidatar svg{width:14px; height:14px; stroke-width:2.4;}
+
+  /* ---------- Galeria (cards) ---------- */
+  .vagas-galeria{display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px;}
+  .vagas-galeria[hidden]{display:none;}
+  .vaga-card{
+    display:flex; flex-direction:column; gap:12px; padding:20px;
+    background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04); transition:box-shadow .2s ease, transform .2s ease;
   }
-  .wa-cal-header{display:flex; align-items:center; justify-content:center; padding:14px 16px; border-bottom:1px solid var(--wa-border);}
-  .wa-cal-title{font-size:14px; font-weight:700; color:var(--wa-text); text-transform:capitalize;}
-  .wa-cal-weekdays{display:grid; grid-template-columns:repeat(7,1fr); border-bottom:1px solid var(--wa-border);}
-  .wa-cal-weekdays span{padding:10px 6px; text-align:center; font-size:11px; font-weight:700; color:var(--wa-text-muted); text-transform:uppercase;}
-  .wa-cal-grid{display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:1fr; align-items:stretch; flex:1;}
-  .wa-cal-cell{min-height:96px; border-right:1px solid #EEF2F6; border-bottom:1px solid #EEF2F6; padding:6px; display:flex; flex-direction:column; gap:4px;}
-  .wa-cal-cell-muted{background:#FAFBFC;}
-  .wa-cal-cell-today{background:var(--wa-primary-soft);}
-  .wa-cal-daynum{font-size:11.5px; font-weight:700; color:var(--wa-text-muted);}
+  .vaga-card:hover{transform:translateY(-2px); box-shadow:0 14px 28px -18px rgba(2,43,83,.4);}
+  .vaga-card h3{margin:0; font-size:16px; color:var(--wa-text);}
+  .vaga-card .tags{display:flex; flex-wrap:wrap; gap:6px;}
+  .vaga-card dl{display:grid; grid-template-columns:auto 1fr; gap:6px 12px; margin:0; font-size:12.5px;}
+  .vaga-card dt{color:var(--wa-text-muted);}
+  .vaga-card dd{margin:0; color:var(--wa-text); font-weight:500; overflow-wrap:anywhere;}
+  .vaga-card p{
+    margin:0; font-size:13px; line-height:1.5; color:var(--wa-text-muted);
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .vaga-card .btn-candidatar{margin-top:auto; width:100%; padding:11px;}
+  .vagas-vazio{grid-column:1/-1; padding:36px 20px; text-align:center; color:#94a3b8; font-size:13px; background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px;}
+
+  .aviso-demo{margin:-6px 0 16px; font-size:12.5px; color:#92400E; background:#FFFBEB; border:1px solid #FDE68A; border-radius:10px; padding:9px 14px;}
+
+  /* ---------- Modais (cadastro de vaga e candidatura, etapa única) ---------- */
+  .modal{
+    position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+    padding:24px; background:rgba(2,20,40,.55); backdrop-filter:blur(3px);
+  }
+  .modal[hidden]{display:none;}
+  .modal svg{fill:none; stroke:currentColor;}
+  .modal-caixa{
+    display:flex; flex-direction:column; width:min(760px,100%); max-height:calc(100vh - 48px);
+    background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 30px 60px -20px rgba(0,0,0,.45);
+    animation:surgir .2s ease;
+  }
+  .modal-caixa.estreita{width:min(560px,100%);}
+  @keyframes surgir{from{opacity:0; transform:translateY(12px) scale(.98);}}
+  .modal-conteudo{display:flex; flex-direction:column; flex:1 1 auto; min-height:0;}
+  .modal-conteudo[hidden]{display:none;}
+  .modal-topo{display:flex; align-items:flex-start; gap:14px; padding:20px 24px; border-bottom:1px solid var(--wa-border);}
+  .modal-topo h2{margin:0; font-size:18px; color:var(--wa-text);}
+  .modal-topo p{margin:4px 0 0; font-size:13px; color:var(--wa-text-muted);}
+  .modal-icone{flex:0 0 40px; height:40px; border-radius:12px; background:var(--gradiente); color:#fff; display:grid; place-items:center;}
+  .modal-icone svg{width:20px; height:20px; stroke-width:2;}
+  .modal-fechar{margin-left:auto; padding:6px; border:none; border-radius:8px; background:transparent; color:var(--wa-text-muted); cursor:pointer; display:inline-flex;}
+  .modal-fechar:hover{background:var(--bg-card); color:var(--wa-text);}
+  .modal-fechar svg{width:18px; height:18px; stroke-width:2.2;}
+  .modal-corpo{padding:20px 24px; overflow-y:auto;}
+  .modal-rodape{display:flex; justify-content:flex-end; align-items:center; gap:10px; padding:16px 24px; border-top:1px solid var(--wa-border); background:#FAFBFC;}
+  .wa-btn-secundario{background:#fff; color:var(--wa-text); border-color:#D5DBE3;}
+  .wa-btn-secundario:hover{border-color:var(--wa-primary); color:var(--wa-primary);}
+  .wa-btn:disabled{opacity:.65; cursor:wait;}
+  .form-erro{margin-right:auto; font-size:12.5px; color:#DC2626;}
+
+  .form-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 16px;}
+  .form-secao{
+    grid-column:1/-1; margin-top:6px; padding-bottom:6px; border-bottom:1px solid #EEF2F6;
+    font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--wa-primary);
+  }
+  .form-secao:first-child{margin-top:0;}
+  .campo{display:flex; flex-direction:column; gap:6px; min-width:0;}
+  .campo.cheio{grid-column:1/-1;}
+  .campo label{font-size:12.5px; font-weight:600; color:#334155;}
+  .campo .obg{color:#DC2626;}
+  .campo :is(input,select,textarea){
+    width:100%; padding:10px 12px; border:1px solid #D5DBE3; border-radius:10px; background:#fff;
+    font:400 13.5px 'Inter',sans-serif; color:var(--wa-text); transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .campo textarea{min-height:84px; resize:vertical;}
+  .campo :is(input,select,textarea):focus{outline:none; border-color:var(--wa-primary); box-shadow:0 0 0 3px rgba(37,99,235,.15);}
+  .campo :is(input,select,textarea):user-invalid{border-color:#DC2626;}
+  .campo small{font-size:11.5px; color:var(--wa-text-muted);}
+  .campo-check{grid-column:1/-1; display:flex; align-items:flex-start; gap:10px; font-size:12.5px; line-height:1.45; color:#334155;}
+  .campo-check input{flex:0 0 auto; width:16px; height:16px; margin:2px 0 0; accent-color:var(--wa-primary);}
+
+  .resumo-vaga{margin-bottom:18px; padding:12px 14px; border-radius:12px; background:var(--wa-primary-soft); font-size:13px; color:var(--wa-text-muted);}
+  .resumo-vaga strong{display:block; font-size:14.5px; color:var(--wa-text);}
+
+  /* Tela de confirmação da candidatura */
+  .confirmacao{padding:12px 8px 4px; text-align:center;}
+  .confirmacao-icone{width:64px; height:64px; margin:0 auto 14px; border-radius:50%; background:#E7F8F0; color:#00A86B; display:grid; place-items:center;}
+  .confirmacao-icone svg{width:32px; height:32px; stroke-width:2.6;}
+  .confirmacao h3{margin:0 0 6px; font-size:20px; color:var(--wa-text);}
+  .confirmacao p{max-width:420px; margin:0 auto; font-size:14px; line-height:1.55; color:var(--wa-text-muted);}
+  .confirmacao .boa-sorte{font-weight:600; color:var(--wa-text);}
+  .btn-whatsapp{
+    display:inline-flex; align-items:center; gap:10px; margin:20px 0 16px; padding:13px 22px; border-radius:12px;
+    background:#25D366; color:#fff; font-size:14.5px; font-weight:700; box-shadow:0 10px 22px -12px rgba(37,211,102,.9);
+    transition:background .15s ease, transform .15s ease;
+  }
+  .btn-whatsapp:hover{background:#1EBE5A; transform:translateY(-1px);}
+  .btn-whatsapp svg{width:20px; height:20px; fill:currentColor; stroke:none;}
+
+  .toast{
+    position:fixed; left:50%; bottom:24px; z-index:200; transform:translateX(-50%);
+    padding:12px 18px; border-radius:12px; background:#0F172A; color:#fff; font-size:13.5px;
+    box-shadow:0 12px 30px -12px rgba(0,0,0,.5);
+  }
+  .toast[hidden]{display:none;}
 
   /* ---------- Responsivo ---------- */
   @media (max-width:1024px){
     .menu{display:none;}
-  }
-  @media (max-width:900px){
-    .wa-cal-months{gap:12px;}
-    .wa-cal-cell{min-height:56px; padding:4px;}
-    .wa-cal-daynum{font-size:10px;}
-    .wa-cal-title{font-size:12px;}
-    .wa-cal-header{padding:10px 8px;}
-    .wa-cal-weekdays span{font-size:9px; padding:6px 2px;}
-    .wa-cal-nav{padding:6px;}
-    .wa-cal-nav svg{width:14px; height:14px;}
   }
   @media (max-width:768px){
     .pagina{padding:18px 16px 40px;}
@@ -184,7 +274,15 @@
   @media (max-width:640px){
     .marca{--h:26px; gap:12px;}
     .topo-acoes .link{display:none;}
-    .wa-cal-cell{min-height:46px; padding:2px;}
+    .wa-view-toggle-btn span{display:none;}
+    .filter-bar{flex-wrap:wrap; height:auto; row-gap:10px; overflow:visible;}
+    .filter-select{flex:1 1 40%;}
+    .filter-spacer, .filter-divider{display:none;}
+    .filter-bar .wa-btn-primary{flex:1 1 auto; justify-content:center;}
+    .modal{padding:0; align-items:flex-end;}
+    .modal-caixa, .modal-caixa.estreita{width:100%; max-height:92vh; border-radius:18px 18px 0 0;}
+    .modal-topo, .modal-corpo, .modal-rodape{padding-left:16px; padding-right:16px;}
+    .form-grid{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -215,51 +313,221 @@
 
 <main class="pagina" id="vagas">
   <div class="filter-bar" id="vagasFilterBar">
-    <select class="filter-select" id="vagasTipoAgendaFiltro" title="Tipo de agenda (setor)">
-      <option value="">Tipo de agenda</option>
+    <select class="filter-select" id="vagasFiltroContrato" title="Tipo de contrato">
+      <option value="">Tipo de contrato</option>
+    </select>
+    <select class="filter-select" id="vagasFiltroModalidade" title="Modalidade">
+      <option value="">Modalidade</option>
     </select>
     <div class="filter-spacer"></div>
     <div class="filter-divider"></div>
-    <div class="wa-view-toggle" id="vagasViewToggle">
-      <button type="button" class="wa-view-toggle-btn active" data-view="table">
+    <div class="wa-view-toggle" id="vagasViewToggle" role="group" aria-label="Modo de exibição">
+      <button type="button" class="wa-view-toggle-btn active" data-view="table" aria-pressed="true" title="Tabela">
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>
         <span>Tabela</span>
       </button>
-      <button type="button" class="wa-view-toggle-btn" data-view="calendar">
-        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        <span>Calendário</span>
+      <button type="button" class="wa-view-toggle-btn" data-view="gallery" aria-pressed="false" title="Galeria">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        <span>Galeria</span>
       </button>
     </div>
-    <button type="button" class="wa-btn wa-btn-primary">
+    <button type="button" class="wa-btn wa-btn-primary" id="btnNovaVaga">
       <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      Nova Campanha
+      Nova vaga
     </button>
   </div>
 
-  <!-- Tabela vazia até a consolidação do novo banco de dados de vagas. -->
+  <p class="aviso-demo" id="avisoDemo" hidden>Modo demonstração: sem conexão com o banco de dados, as vagas e candidaturas ficam salvas apenas neste navegador.</p>
+
   <div class="wa-card" id="vagasTableView">
     <div class="wa-table-wrap">
       <table class="wa-table">
+        <thead>
+          <tr>
+            <th>Vaga</th><th>Contrato</th><th>Modalidade</th><th>Local</th><th>Remuneração</th><th>Período</th><th>Vagas</th>
+            <th class="col-acao"><span hidden>Ação</span></th>
+          </tr>
+        </thead>
         <tbody id="vagasTableBody">
-          <tr class="wa-empty-row"><td>Nenhuma vaga cadastrada.</td></tr>
+          <tr class="wa-empty-row"><td colspan="8">Carregando vagas…</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="wa-card wa-cal-carousel-card" id="vagasCalendarView" hidden>
-    <div class="wa-cal-carousel">
-      <button type="button" class="wa-icon-btn wa-cal-nav" id="vagasCalPrev" title="Mês anterior">
-        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </button>
-      <div class="wa-cal-months" id="vagasCalMonths"></div>
-      <button type="button" class="wa-icon-btn wa-cal-nav" id="vagasCalNext" title="Próximo mês">
-        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </button>
-    </div>
-  </div>
+  <div class="vagas-galeria" id="vagasGalleryView" hidden></div>
 </main>
 
+<!-- ============ Modal: cadastro de vaga (etapa única) ============ -->
+<div class="modal" id="modalVaga" role="dialog" aria-modal="true" aria-labelledby="modalVagaTitulo" hidden>
+  <div class="modal-caixa">
+    <form class="modal-conteudo" id="formVaga">
+      <div class="modal-topo">
+        <span class="modal-icone"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
+        <div>
+          <h2 id="modalVagaTitulo">Cadastrar nova vaga</h2>
+          <p>Preencha os dados da vaga. Ela aparece na lista assim que for publicada.</p>
+        </div>
+        <button type="button" class="modal-fechar" data-fechar aria-label="Fechar"><svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-corpo">
+        <div class="form-grid">
+          <div class="form-secao">Sobre a vaga</div>
+          <div class="campo">
+            <label for="vCargo">Cargo <span class="obg">*</span></label>
+            <input id="vCargo" name="cargo" required maxlength="80" placeholder="Ex.: Atendente de loja">
+          </div>
+          <div class="campo">
+            <label for="vEmpresa">Empresa <span class="obg">*</span></label>
+            <input id="vEmpresa" name="empresa" required maxlength="80" placeholder="Nome da empresa">
+          </div>
+          <div class="campo">
+            <label for="vContrato">Tipo de contrato <span class="obg">*</span></label>
+            <select id="vContrato" name="tipo_contrato" required data-opcoes="contratos"><option value="">Selecione</option></select>
+          </div>
+          <div class="campo">
+            <label for="vModalidade">Modalidade <span class="obg">*</span></label>
+            <select id="vModalidade" name="modalidade" required data-opcoes="modalidades"><option value="">Selecione</option></select>
+          </div>
+          <div class="campo">
+            <label for="vLocal">Local <span class="obg">*</span></label>
+            <input id="vLocal" name="local" required maxlength="80" placeholder="Bairro, cidade">
+          </div>
+          <div class="campo">
+            <label for="vQuantidade">Quantidade de vagas</label>
+            <input id="vQuantidade" name="quantidade" type="number" min="1" max="999" value="1">
+          </div>
+          <div class="campo">
+            <label for="vRemuneracao">Remuneração</label>
+            <input id="vRemuneracao" name="remuneracao" maxlength="60" placeholder="Ex.: R$ 1.800,00 / mês">
+          </div>
+          <div class="campo">
+            <label for="vCarga">Carga horária</label>
+            <input id="vCarga" name="carga_horaria" maxlength="60" placeholder="Ex.: 44h semanais, seg. a sáb.">
+          </div>
+          <div class="campo">
+            <label for="vInicio">Início</label>
+            <input id="vInicio" name="inicio" type="date">
+          </div>
+          <div class="campo">
+            <label for="vTermino">Término</label>
+            <input id="vTermino" name="termino" type="date">
+          </div>
+
+          <div class="form-secao">Detalhes</div>
+          <div class="campo cheio">
+            <label for="vDescricao">Descrição das atividades <span class="obg">*</span></label>
+            <textarea id="vDescricao" name="descricao" required maxlength="1500" placeholder="O que a pessoa vai fazer no dia a dia"></textarea>
+          </div>
+          <div class="campo cheio">
+            <label for="vRequisitos">Requisitos</label>
+            <textarea id="vRequisitos" name="requisitos" maxlength="1000" placeholder="Escolaridade, experiência, disponibilidade…"></textarea>
+          </div>
+          <div class="campo cheio">
+            <label for="vBeneficios">Benefícios</label>
+            <input id="vBeneficios" name="beneficios" maxlength="200" placeholder="Ex.: Vale-transporte, alimentação no local">
+          </div>
+
+          <div class="form-secao">Contato</div>
+          <div class="campo">
+            <label for="vWhatsapp">WhatsApp para contato <span class="obg">*</span></label>
+            <input id="vWhatsapp" name="whatsapp" type="tel" inputmode="numeric" required data-mascara="telefone"
+              pattern="\(\d{2}\) \d{4,5}-\d{4}" placeholder="(65) 99999-9999" title="Informe DDD + número, ex.: (65) 99999-9999">
+            <small>Os candidatos vão falar com a empresa por este número.</small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-rodape">
+        <span class="form-erro" role="alert" hidden></span>
+        <button type="button" class="wa-btn wa-btn-secundario" data-fechar>Cancelar</button>
+        <button type="submit" class="wa-btn wa-btn-primary">Publicar vaga</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ Modal: candidatura (etapa única + confirmação) ============ -->
+<div class="modal" id="modalCandidatura" role="dialog" aria-modal="true" aria-labelledby="modalCandTitulo" hidden>
+  <div class="modal-caixa estreita">
+    <form class="modal-conteudo" id="formCandidatura">
+      <div class="modal-topo">
+        <span class="modal-icone"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg></span>
+        <div>
+          <h2 id="modalCandTitulo">Candidatar-se</h2>
+          <p>Seus dados ficam registrados nesta vaga para a empresa responsável.</p>
+        </div>
+        <button type="button" class="modal-fechar" data-fechar aria-label="Fechar"><svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-corpo">
+        <div class="resumo-vaga" id="candResumo"></div>
+        <div class="form-grid">
+          <div class="campo cheio">
+            <label for="cNome">Nome completo <span class="obg">*</span></label>
+            <input id="cNome" name="nome" required maxlength="100" autocomplete="name">
+          </div>
+          <div class="campo">
+            <label for="cWhatsapp">WhatsApp <span class="obg">*</span></label>
+            <input id="cWhatsapp" name="whatsapp" type="tel" inputmode="numeric" required data-mascara="telefone" autocomplete="tel"
+              pattern="\(\d{2}\) \d{4,5}-\d{4}" placeholder="(65) 99999-9999" title="Informe DDD + número, ex.: (65) 99999-9999">
+          </div>
+          <div class="campo">
+            <label for="cEmail">E-mail</label>
+            <input id="cEmail" name="email" type="email" maxlength="120" autocomplete="email">
+          </div>
+          <div class="campo">
+            <label for="cCidade">Cidade / bairro</label>
+            <input id="cCidade" name="cidade" maxlength="80">
+          </div>
+          <div class="campo">
+            <label for="cDisponibilidade">Disponibilidade <span class="obg">*</span></label>
+            <select id="cDisponibilidade" name="disponibilidade" required>
+              <option value="">Selecione</option>
+              <option>Imediata</option>
+              <option>Em até 15 dias</option>
+              <option>Em até 30 dias</option>
+            </select>
+          </div>
+          <div class="campo cheio">
+            <label for="cApresentacao">Conte um pouco sobre sua experiência</label>
+            <textarea id="cApresentacao" name="apresentacao" maxlength="1000" placeholder="Onde já trabalhou, cursos, por que quer a vaga…"></textarea>
+          </div>
+          <label class="campo-check">
+            <input type="checkbox" name="consentimento" required>
+            <span>Autorizo o envio dos meus dados para a empresa responsável por esta vaga, para fins de seleção.</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-rodape">
+        <span class="form-erro" role="alert" hidden></span>
+        <button type="button" class="wa-btn wa-btn-secundario" data-fechar>Cancelar</button>
+        <button type="submit" class="wa-btn wa-btn-primary">Enviar candidatura</button>
+      </div>
+    </form>
+
+    <div class="modal-conteudo" id="candConfirmacao" hidden>
+      <div class="modal-corpo">
+        <div class="confirmacao">
+          <div class="confirmacao-icone"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+          <h3>Candidatura enviada!</h3>
+          <p id="confTexto"></p>
+          <a class="btn-whatsapp" id="confWhatsapp" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.04 21.5h-.01a9.43 9.43 0 0 1-4.8-1.32l-.35-.2-3.57.93.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.02c0-5.2 4.24-9.44 9.45-9.44 2.52 0 4.9.99 6.68 2.77a9.38 9.38 0 0 1 2.76 6.68c0 5.21-4.24 9.44-9.45 9.44zm8.04-17.48A11.3 11.3 0 0 0 12.04.67C5.77.67.67 5.77.67 12.04c0 2 .52 3.96 1.52 5.68L.57 23.33l5.74-1.5a11.33 11.33 0 0 0 5.73 1.46h.01c6.27 0 11.37-5.1 11.37-11.37 0-3.04-1.18-5.89-3.34-8.04z"/></svg>
+            Falar com a empresa no WhatsApp
+          </a>
+          <p class="boa-sorte">Agora compartilhe seu currículo para a empresa e aguarde contato. Boa sorte!</p>
+        </div>
+      </div>
+      <div class="modal-rodape">
+        <button type="button" class="wa-btn wa-btn-secundario" data-fechar>Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- Gerado a partir do .env por scripts/gerar_config.py (fora do Git). Sem ele, a página roda em modo demonstração. -->
+<script src="../config.js"></script>
 <script>
   // Cabeçalho com fundo ao rolar
   const topo = document.getElementById('topo');
@@ -267,51 +535,295 @@
   window.addEventListener('scroll', marcarTopo, { passive: true });
   marcarTopo();
 
-  // Alternador Tabela / Calendário e calendário de 2 meses (vazio até o novo banco de dados).
+  // Cadastro de vagas, listagem (Tabela/Galeria) e candidatura.
   (() => {
-    const tabela = document.getElementById('vagasTableView');
-    const calendario = document.getElementById('vagasCalendarView');
-    const meses = document.getElementById('vagasCalMonths');
-    const hoje = new Date();
-    let calDate = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    const CONTRATOS = ['Temporário', 'CLT', 'PJ', 'Estágio', 'Jovem Aprendiz', 'Freelancer'];
+    const MODALIDADES = ['Presencial', 'Híbrido', 'Remoto'];
 
-    const rotuloMes = d => {
-      const nome = d.toLocaleDateString('pt-BR', { month: 'long' });
-      return `${nome.charAt(0).toUpperCase() + nome.slice(1)} - ${d.getFullYear()}`;
-    };
-    // Sempre 6 semanas (42 células): os dois painéis ficam com a mesma altura.
-    const painelMes = (ano, mes) => {
-      const inicio = new Date(ano, mes, 1).getDay();
-      const dias = new Date(ano, mes + 1, 0).getDate();
-      let celulas = '';
-      for (let i = 0; i < 42; i++) {
-        const dia = i - inicio + 1;
-        if (dia < 1 || dia > dias) { celulas += '<div class="wa-cal-cell wa-cal-cell-muted"></div>'; continue; }
-        const ehHoje = ano === hoje.getFullYear() && mes === hoje.getMonth() && dia === hoje.getDate();
-        celulas += `<div class="wa-cal-cell${ehHoje ? ' wa-cal-cell-today' : ''}"><div class="wa-cal-daynum">${dia}</div></div>`;
+    // ---------- Dados: Supabase quando o config.js existe; senão, localStorage (modo demonstração) ----------
+    const cfg = window.APP_CONFIG || {};
+    const SUPA = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY
+      ? { url: cfg.SUPABASE_URL.replace(/\/+$/, ''), chave: cfg.SUPABASE_ANON_KEY }
+      : null;
+
+    const local = {
+      ler(chave) { try { return JSON.parse(localStorage.getItem(chave)) || []; } catch { return []; } },
+      gravar(chave, valor) {
+        try { localStorage.setItem(chave, JSON.stringify(valor)); }
+        catch { throw new Error('Não foi possível salvar neste navegador.'); }
       }
-      return `<div class="wa-cal-month-panel">
-        <div class="wa-cal-header"><div class="wa-cal-title">${rotuloMes(new Date(ano, mes, 1))}</div></div>
-        <div class="wa-cal-weekdays"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
-        <div class="wa-cal-grid">${celulas}</div>
-      </div>`;
     };
-    const desenhar = () => {
-      const prox = new Date(calDate.getFullYear(), calDate.getMonth() + 1, 1);
-      meses.innerHTML = painelMes(calDate.getFullYear(), calDate.getMonth()) + painelMes(prox.getFullYear(), prox.getMonth());
-    };
-    const mover = n => { calDate = new Date(calDate.getFullYear(), calDate.getMonth() + n, 1); desenhar(); };
-    document.getElementById('vagasCalPrev').addEventListener('click', () => mover(-1));
-    document.getElementById('vagasCalNext').addEventListener('click', () => mover(1));
+    const novoId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 
-    const botoes = document.querySelectorAll('#vagasViewToggle .wa-view-toggle-btn');
-    botoes.forEach(btn => btn.addEventListener('click', () => {
-      const cal = btn.dataset.view === 'calendar';
-      botoes.forEach(b => b.classList.toggle('active', b === btn));
-      tabela.hidden = cal;
-      calendario.hidden = !cal;
-      if (cal) desenhar();
-    }));
+    const supa = async (caminho, opcoes = {}) => {
+      const r = await fetch(`${SUPA.url}/rest/v1/${caminho}`, {
+        ...opcoes,
+        headers: { apikey: SUPA.chave, Authorization: `Bearer ${SUPA.chave}`, 'Content-Type': 'application/json', ...opcoes.headers }
+      });
+      if (!r.ok) throw new Error(`Erro ${r.status} ao falar com o banco de dados.`);
+      if (r.status === 204 || opcoes.headers?.Prefer === 'return=minimal') return null;
+      return r.json();
+    };
+
+    const api = {
+      async listarVagas() {
+        if (SUPA) return supa('vagas?select=*&ativa=eq.true&order=created_at.desc');
+        return local.ler('cdl_vagas');
+      },
+      async criarVaga(vaga) {
+        if (SUPA) {
+          const [criada] = await supa('vagas', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(vaga) });
+          return criada;
+        }
+        const criada = { ...vaga, id: novoId(), created_at: new Date().toISOString(), ativa: true };
+        local.gravar('cdl_vagas', [criada, ...local.ler('cdl_vagas')]);
+        return criada;
+      },
+      async candidatar(candidatura) {
+        if (SUPA) return supa('candidaturas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(candidatura) });
+        local.gravar('cdl_candidaturas', [...local.ler('cdl_candidaturas'), { ...candidatura, id: novoId(), created_at: new Date().toISOString() }]);
+      }
+    };
+
+    // ---------- Utilitários ----------
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const dataBR = d => d ? d.split('-').reverse().join('/') : '';
+    const periodo = v =>
+      v.inicio && v.termino ? `${dataBR(v.inicio)} a ${dataBR(v.termino)}`
+      : v.inicio ? `A partir de ${dataBR(v.inicio)}`
+      : v.termino ? `Até ${dataBR(v.termino)}`
+      : 'A combinar';
+    const soDigitos = v => String(v || '').replace(/\D/g, '');
+    const mascaraTelefone = v => {
+      const d = soDigitos(v).slice(0, 11);
+      if (d.length <= 2) return d ? `(${d}` : '';
+      if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+      if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+      return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+    };
+    const linkWhatsapp = (numero, texto) => {
+      let n = soDigitos(numero);
+      if (n.length <= 11) n = '55' + n;
+      return `https://wa.me/${n}?text=${encodeURIComponent(texto)}`;
+    };
+    // Campos vazios viram null (colunas de data no banco não aceitam '').
+    const lerFormulario = form => {
+      const dados = {};
+      new FormData(form).forEach((v, k) => { const t = String(v).trim(); dados[k] = t === '' ? null : t; });
+      return dados;
+    };
+
+    let toastTimer;
+    const avisar = msg => {
+      const t = $('toast');
+      t.textContent = msg; t.hidden = false;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
+    };
+
+    // ---------- Opções dos selects (uma única lista para filtros e formulário) ----------
+    const preencher = (select, lista) => select.insertAdjacentHTML('beforeend', lista.map(o => `<option>${esc(o)}</option>`).join(''));
+    preencher($('vagasFiltroContrato'), CONTRATOS);
+    preencher($('vagasFiltroModalidade'), MODALIDADES);
+    preencher($('vContrato'), CONTRATOS);
+    preencher($('vModalidade'), MODALIDADES);
+
+    document.querySelectorAll('[data-mascara="telefone"]').forEach(inp =>
+      inp.addEventListener('input', () => { inp.value = mascaraTelefone(inp.value); }));
+
+    // ---------- Listagem ----------
+    let vagas = [];
+    const iconeCandidatar = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+    const botaoCandidatar = v => `<button type="button" class="btn-candidatar" data-candidatar="${esc(v.id)}">Candidatar-se ${iconeCandidatar}</button>`;
+
+    const filtradas = () => {
+      const contrato = $('vagasFiltroContrato').value;
+      const modalidade = $('vagasFiltroModalidade').value;
+      return vagas.filter(v => (!contrato || v.tipo_contrato === contrato) && (!modalidade || v.modalidade === modalidade));
+    };
+
+    const renderizar = (mensagemVazia) => {
+      const lista = filtradas();
+      const vazio = mensagemVazia || (vagas.length ? 'Nenhuma vaga encontrada com esses filtros.' : 'Nenhuma vaga cadastrada. Clique em "Nova vaga" para publicar a primeira.');
+
+      $('vagasTableBody').innerHTML = lista.length ? lista.map(v => `
+        <tr>
+          <td><div class="vaga-cargo">${esc(v.cargo)}</div><div class="vaga-sub">${esc(v.empresa)}</div></td>
+          <td><span class="tag">${esc(v.tipo_contrato)}</span></td>
+          <td><span class="tag tag-verde">${esc(v.modalidade)}</span></td>
+          <td>${esc(v.local)}</td>
+          <td>${esc(v.remuneracao || 'A combinar')}</td>
+          <td>${esc(periodo(v))}</td>
+          <td>${esc(v.quantidade || 1)}</td>
+          <td class="col-acao">${botaoCandidatar(v)}</td>
+        </tr>`).join('')
+        : `<tr class="wa-empty-row"><td colspan="8">${esc(vazio)}</td></tr>`;
+
+      $('vagasGalleryView').innerHTML = lista.length ? lista.map(v => `
+        <article class="vaga-card">
+          <div>
+            <h3>${esc(v.cargo)}</h3>
+            <div class="vaga-sub">${esc(v.empresa)}</div>
+          </div>
+          <div class="tags"><span class="tag">${esc(v.tipo_contrato)}</span><span class="tag tag-verde">${esc(v.modalidade)}</span></div>
+          <dl>
+            <dt>Local</dt><dd>${esc(v.local)}</dd>
+            <dt>Remuneração</dt><dd>${esc(v.remuneracao || 'A combinar')}</dd>
+            <dt>Período</dt><dd>${esc(periodo(v))}</dd>
+            ${v.carga_horaria ? `<dt>Carga horária</dt><dd>${esc(v.carga_horaria)}</dd>` : ''}
+            <dt>Vagas</dt><dd>${esc(v.quantidade || 1)}</dd>
+          </dl>
+          <p>${esc(v.descricao)}</p>
+          ${botaoCandidatar(v)}
+        </article>`).join('')
+        : `<div class="vagas-vazio">${esc(vazio)}</div>`;
+    };
+
+    const carregar = async () => {
+      try {
+        vagas = await api.listarVagas();
+        renderizar();
+      } catch (e) {
+        vagas = [];
+        renderizar('Não foi possível carregar as vagas agora. Tente novamente em instantes.');
+        console.error(e);
+      }
+    };
+
+    $('vagasFiltroContrato').addEventListener('change', () => renderizar());
+    $('vagasFiltroModalidade').addEventListener('change', () => renderizar());
+
+    // ---------- Switch Tabela / Galeria ----------
+    const botoesVisao = document.querySelectorAll('#vagasViewToggle .wa-view-toggle-btn');
+    const mostrarVisao = visao => {
+      botoesVisao.forEach(b => {
+        const ativo = b.dataset.view === visao;
+        b.classList.toggle('active', ativo);
+        b.setAttribute('aria-pressed', ativo);
+      });
+      $('vagasTableView').hidden = visao !== 'table';
+      $('vagasGalleryView').hidden = visao !== 'gallery';
+      try { localStorage.setItem('cdl_vagas_visao', visao); } catch {}
+    };
+    botoesVisao.forEach(b => b.addEventListener('click', () => mostrarVisao(b.dataset.view)));
+    try { if (localStorage.getItem('cdl_vagas_visao') === 'gallery') mostrarVisao('gallery'); } catch {}
+
+    // ---------- Modais ----------
+    let modalAberto = null;
+    const abrirModal = modal => {
+      modalAberto = modal;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      modal.querySelector('form:not([hidden]) input, form:not([hidden]) select')?.focus();
+    };
+    const fecharModal = () => {
+      if (!modalAberto) return;
+      modalAberto.hidden = true;
+      modalAberto = null;
+      document.body.style.overflow = '';
+    };
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-fechar]')) fecharModal(); });
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+    const mostrarErro = (form, msg) => {
+      const el = form.querySelector('.form-erro');
+      el.textContent = msg || '';
+      el.hidden = !msg;
+    };
+    const ocupado = (form, sim, rotulo) => {
+      const btn = form.querySelector('[type="submit"]');
+      btn.disabled = sim;
+      if (sim) { btn.dataset.rotulo = btn.textContent; btn.textContent = rotulo; }
+      else if (btn.dataset.rotulo) btn.textContent = btn.dataset.rotulo;
+    };
+
+    // ---------- Cadastro de vaga ----------
+    const formVaga = $('formVaga');
+    $('btnNovaVaga').addEventListener('click', () => {
+      formVaga.reset();
+      mostrarErro(formVaga);
+      abrirModal($('modalVaga'));
+    });
+    // Término não pode ser antes do início.
+    const validarPeriodo = () => {
+      const ini = $('vInicio').value, fim = $('vTermino').value;
+      $('vTermino').min = ini;
+      $('vTermino').setCustomValidity(ini && fim && fim < ini ? 'O término deve ser depois do início.' : '');
+    };
+    $('vInicio').addEventListener('change', validarPeriodo);
+    $('vTermino').addEventListener('change', validarPeriodo);
+
+    formVaga.addEventListener('submit', async e => {
+      e.preventDefault();
+      const dados = lerFormulario(formVaga);
+      dados.whatsapp = soDigitos(dados.whatsapp);
+      dados.quantidade = Math.max(1, parseInt(dados.quantidade, 10) || 1);
+      mostrarErro(formVaga);
+      ocupado(formVaga, true, 'Publicando…');
+      try {
+        await api.criarVaga(dados);
+        fecharModal();
+        await carregar();
+        avisar('Vaga publicada com sucesso!');
+      } catch (err) {
+        mostrarErro(formVaga, err.message || 'Não foi possível publicar a vaga.');
+      } finally {
+        ocupado(formVaga, false);
+      }
+    });
+
+    // ---------- Candidatura ----------
+    const formCand = $('formCandidatura');
+    let vagaSelecionada = null;
+
+    document.getElementById('vagas').addEventListener('click', e => {
+      const btn = e.target.closest('[data-candidatar]');
+      if (!btn) return;
+      vagaSelecionada = vagas.find(v => String(v.id) === btn.dataset.candidatar);
+      if (!vagaSelecionada) return;
+      formCand.reset();
+      mostrarErro(formCand);
+      $('candResumo').innerHTML = `<strong>${esc(vagaSelecionada.cargo)}</strong>${esc(vagaSelecionada.empresa)} · ${esc(vagaSelecionada.local)}`;
+      formCand.hidden = false;
+      $('candConfirmacao').hidden = true;
+      abrirModal($('modalCandidatura'));
+    });
+
+    formCand.addEventListener('submit', async e => {
+      e.preventDefault();
+      const dados = lerFormulario(formCand);
+      const candidatura = {
+        vaga_id: vagaSelecionada.id,
+        nome: dados.nome,
+        whatsapp: soDigitos(dados.whatsapp),
+        email: dados.email,
+        cidade: dados.cidade,
+        disponibilidade: dados.disponibilidade,
+        apresentacao: dados.apresentacao,
+        consentimento: true
+      };
+      mostrarErro(formCand);
+      ocupado(formCand, true, 'Enviando…');
+      try {
+        await api.candidatar(candidatura);
+        const v = vagaSelecionada;
+        $('confTexto').innerHTML = `Sua candidatura para <strong>${esc(v.cargo)}</strong> na <strong>${esc(v.empresa)}</strong> foi registrada.`;
+        $('confWhatsapp').href = linkWhatsapp(v.whatsapp,
+          `Olá! Meu nome é ${candidatura.nome} e acabei de me candidatar à vaga de ${v.cargo} (${v.empresa}) pelo portal de vagas da CDL Cuiabá. Vou te enviar meu currículo.`);
+        formCand.hidden = true;
+        $('candConfirmacao').hidden = false;
+      } catch (err) {
+        mostrarErro(formCand, err.message || 'Não foi possível enviar a candidatura.');
+      } finally {
+        ocupado(formCand, false);
+      }
+    });
+
+    $('avisoDemo').hidden = !!SUPA;
+    carregar();
   })();
 </script>
 </body>
