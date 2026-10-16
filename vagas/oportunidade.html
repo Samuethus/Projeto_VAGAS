@@ -137,10 +137,13 @@
 
   .wa-card{background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.04);}
   .wa-table-wrap{overflow-x:auto;}
-  /* A 1ª coluna (nome da vaga) aparece sempre completa e fica com o espaço que sobrar;
-     as demais colunas de dados têm a mesma largura e texto longo termina em "…". */
-  .wa-table{width:100%; border-collapse:collapse; text-align:left; font-size:13px; color:var(--wa-text-muted);}
-  .wa-table :is(th,td):not(:first-child, .col-acao){width:130px; max-width:130px; overflow:hidden; text-overflow:ellipsis;}
+  /* A 1ª coluna (nome da vaga) se ajusta ao maior nome cadastrado, sempre completo;
+     as demais colunas de dados dividem o restante em partes iguais e texto longo termina em "…". */
+  .wa-table{width:100%; min-width:1000px; border-collapse:collapse; text-align:left; font-size:13px; color:var(--wa-text-muted);}
+  .wa-table :is(th,td):first-child{width:1%;}
+  .wa-table th:not(:first-child, .col-acao){width:12%;}
+  /* width:0 + min-width:100%: o conteúdo não alarga a coluna, só ocupa a largura dela. */
+  .wa-table .cel{display:block; width:0; min-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .wa-table th{
     padding:12px 20px; background:#F8FAFC; border-bottom:1px solid var(--wa-border);
     font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap;
@@ -701,13 +704,13 @@
       $('vagasTableBody').innerHTML = lista.length ? lista.map(v => `
         <tr>
           <td><button type="button" class="vaga-cargo vaga-link" data-detalhe="${esc(v.id)}" title="Ver detalhes da vaga">${esc(v.cargo)}</button></td>
-          <td class="col-empresa" title="${esc(v.empresa)}">${esc(v.empresa)}</td>
-          <td><span class="tag">${esc(v.tipo_contrato)}</span></td>
-          <td><span class="tag tag-verde">${esc(v.modalidade)}</span></td>
-          <td title="${esc(v.local)}">${esc(v.local)}</td>
-          <td title="${esc(v.remuneracao || 'A combinar')}">${esc(v.remuneracao || 'A combinar')}</td>
-          <td title="${esc(periodo(v))}">${esc(periodo(v))}</td>
-          <td>${esc(v.quantidade || 1)}</td>
+          <td class="col-empresa"><div class="cel" title="${esc(v.empresa)}">${esc(v.empresa)}</div></td>
+          <td><div class="cel"><span class="tag">${esc(v.tipo_contrato)}</span></div></td>
+          <td><div class="cel"><span class="tag tag-verde">${esc(v.modalidade)}</span></div></td>
+          <td><div class="cel" title="${esc(v.local)}">${esc(v.local)}</div></td>
+          <td><div class="cel" title="${esc(v.remuneracao || 'A combinar')}">${esc(v.remuneracao || 'A combinar')}</div></td>
+          <td><div class="cel" title="${esc(periodo(v))}">${esc(periodo(v))}</div></td>
+          <td><div class="cel">${esc(v.quantidade || 1)}</div></td>
           <td class="col-acao">${botaoCandidatar(v)}</td>
         </tr>`).join('')
         : `<tr class="wa-empty-row"><td colspan="9">${esc(vazio)}</td></tr>`;
