@@ -137,9 +137,10 @@
 
   .wa-card{background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.04);}
   .wa-table-wrap{overflow-x:auto;}
-  /* Layout fixo: as colunas de dados dividem a largura em partes iguais; texto longo termina em "…". */
-  .wa-table{width:100%; min-width:1100px; table-layout:fixed; border-collapse:collapse; text-align:left; font-size:13px; color:var(--wa-text-muted);}
-  .wa-table :is(th,td){overflow:hidden; text-overflow:ellipsis;}
+  /* A 1ª coluna (nome da vaga) aparece sempre completa e fica com o espaço que sobrar;
+     as demais colunas de dados têm a mesma largura e texto longo termina em "…". */
+  .wa-table{width:100%; border-collapse:collapse; text-align:left; font-size:13px; color:var(--wa-text-muted);}
+  .wa-table :is(th,td):not(:first-child, .col-acao){width:130px; max-width:130px; overflow:hidden; text-overflow:ellipsis;}
   .wa-table th{
     padding:12px 20px; background:#F8FAFC; border-bottom:1px solid var(--wa-border);
     font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap;
@@ -151,7 +152,7 @@
   .wa-table .col-acao{position:sticky; right:0; background:var(--wa-card); text-align:right; width:170px;}
   .wa-table th.col-acao{background:#F8FAFC;}
   .wa-table .col-empresa{font-weight:500; color:var(--wa-text);}
-  .wa-table .vaga-link{display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .wa-table .vaga-link{white-space:nowrap;}
 
   .vaga-cargo{font-size:13.5px; font-weight:700; color:var(--wa-text);}
   /* Nome da vaga na tabela: abre o detalhamento */
@@ -699,7 +700,7 @@
 
       $('vagasTableBody').innerHTML = lista.length ? lista.map(v => `
         <tr>
-          <td><button type="button" class="vaga-cargo vaga-link" data-detalhe="${esc(v.id)}" title="Ver detalhes: ${esc(v.cargo)}">${esc(v.cargo)}</button></td>
+          <td><button type="button" class="vaga-cargo vaga-link" data-detalhe="${esc(v.id)}" title="Ver detalhes da vaga">${esc(v.cargo)}</button></td>
           <td class="col-empresa" title="${esc(v.empresa)}">${esc(v.empresa)}</td>
           <td><span class="tag">${esc(v.tipo_contrato)}</span></td>
           <td><span class="tag tag-verde">${esc(v.modalidade)}</span></td>
