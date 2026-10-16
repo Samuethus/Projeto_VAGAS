@@ -1,0 +1,42 @@
+# --- Segredos e configuração local ---
+links_power.txt
+.json
+*.json
+.env
+.env.local
+.env.*.local
+.env.*
+!.env.example
+# .mcp.json só tem o endereço do MCP do Survey Monkey (login por OAuth, sem token)
+!.mcp.json
+# config.js é gerado do .env (contém URL/chave do projeto)
+config.js
+*.pem
+*.key
+
+# --- Ferramentas locais (a permissão salva pode conter chaves coladas) ---
+.claude/
+
+# --- Dependências ---
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# --- Logs e temporários ---
+*.log
+npm-debug.log*
+*.tmp
+*.temp
+*.bak
+*.swp
+~$*
+
+# --- Sistema operacional / editor ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+.claude/settings.local.json
+.cnpj_tmp/
