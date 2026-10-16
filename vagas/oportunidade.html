@@ -137,18 +137,21 @@
 
   .wa-card{background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.04);}
   .wa-table-wrap{overflow-x:auto;}
-  .wa-table{width:100%; border-collapse:collapse; text-align:left; font-size:13px; color:var(--wa-text-muted);}
+  /* Layout fixo: as colunas de dados dividem a largura em partes iguais; texto longo termina em "…". */
+  .wa-table{width:100%; min-width:1100px; table-layout:fixed; border-collapse:collapse; text-align:left; font-size:13px; color:var(--wa-text-muted);}
+  .wa-table :is(th,td){overflow:hidden; text-overflow:ellipsis;}
   .wa-table th{
     padding:12px 20px; background:#F8FAFC; border-bottom:1px solid var(--wa-border);
     font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap;
   }
   .wa-table td{padding:14px 20px; vertical-align:middle; white-space:nowrap;}
   .wa-table tbody tr + tr td{border-top:1px solid #EEF2F6;}
-  .wa-empty-row td{padding:36px 20px; text-align:center; color:#94a3b8; font-size:13px;}
+  .wa-empty-row td{padding:36px 20px; text-align:center; color:#94a3b8; font-size:13px; white-space:normal;}
   /* Coluna do botão fixa à direita: no celular a tabela rola e o "Candidatar-se" continua à vista. */
-  .wa-table .col-acao{position:sticky; right:0; background:var(--wa-card); text-align:right; width:1%;}
+  .wa-table .col-acao{position:sticky; right:0; background:var(--wa-card); text-align:right; width:170px;}
   .wa-table th.col-acao{background:#F8FAFC;}
-  .wa-table .col-empresa{white-space:nowrap; font-weight:500; color:var(--wa-text);}
+  .wa-table .col-empresa{font-weight:500; color:var(--wa-text);}
+  .wa-table .vaga-link{display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 
   .vaga-cargo{font-size:13.5px; font-weight:700; color:var(--wa-text);}
   /* Nome da vaga na tabela: abre o detalhamento */
@@ -696,13 +699,13 @@
 
       $('vagasTableBody').innerHTML = lista.length ? lista.map(v => `
         <tr>
-          <td><button type="button" class="vaga-cargo vaga-link" data-detalhe="${esc(v.id)}" title="Ver detalhes da vaga">${esc(v.cargo)}</button></td>
-          <td class="col-empresa">${esc(v.empresa)}</td>
+          <td><button type="button" class="vaga-cargo vaga-link" data-detalhe="${esc(v.id)}" title="Ver detalhes: ${esc(v.cargo)}">${esc(v.cargo)}</button></td>
+          <td class="col-empresa" title="${esc(v.empresa)}">${esc(v.empresa)}</td>
           <td><span class="tag">${esc(v.tipo_contrato)}</span></td>
           <td><span class="tag tag-verde">${esc(v.modalidade)}</span></td>
-          <td>${esc(v.local)}</td>
-          <td>${esc(v.remuneracao || 'A combinar')}</td>
-          <td>${esc(periodo(v))}</td>
+          <td title="${esc(v.local)}">${esc(v.local)}</td>
+          <td title="${esc(v.remuneracao || 'A combinar')}">${esc(v.remuneracao || 'A combinar')}</td>
+          <td title="${esc(periodo(v))}">${esc(periodo(v))}</td>
           <td>${esc(v.quantidade || 1)}</td>
           <td class="col-acao">${botaoCandidatar(v)}</td>
         </tr>`).join('')
