@@ -9,8 +9,8 @@ links_power.txt
 !.env.example
 # .mcp.json só tem o endereço do MCP do Survey Monkey (login por OAuth, sem token)
 !.mcp.json
-# config.js é gerado do .env (contém URL/chave do projeto)
-config.js
+# config.js (gerado do .env) VAI para o Git de propósito: o site no GitHub Pages precisa dele.
+# Só pode conter a chave publishable/anon do Supabase. NUNCA a service_role/secret.
 *.pem
 *.key
 

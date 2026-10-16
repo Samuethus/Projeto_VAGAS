@@ -1,6 +1,7 @@
 """Gera o config.js (na raiz do projeto) a partir do .env.
 
-O config.js fica fora do Git (ver .gitignore) e é lido por vagas/oportunidade.html.
+Versão principal: scripts/gerar_config.ps1 (que também recusa chaves secretas).
+O config.js vai para o Git: use só a chave publishable/anon do Supabase.
 Uso:  python scripts/gerar_config.py
 """
 import json
@@ -30,7 +31,7 @@ def main() -> None:
     config = {c: env[c] for c in CHAVES}
     destino = RAIZ / "config.js"
     destino.write_text(
-        "// Gerado por scripts/gerar_config.py a partir do .env. Não edite nem envie ao Git.\n"
+        "// Gerado por scripts/gerar_config.py a partir do .env. Não edite à mão; contém só a chave pública.\n"
         f"window.APP_CONFIG = {json.dumps(config, indent=2)};\n",
         encoding="utf-8",
     )
