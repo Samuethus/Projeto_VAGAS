@@ -150,6 +150,9 @@
   .wa-table th.col-acao{background:#F8FAFC;}
 
   .vaga-cargo{font-size:13.5px; font-weight:700; color:var(--wa-text);}
+  /* Nome da vaga na tabela: abre o detalhamento */
+  .vaga-link{padding:0; border:none; background:none; font-family:inherit; color:inherit; text-align:left; cursor:pointer;}
+  .vaga-link:hover, .vaga-link:focus-visible{color:var(--wa-primary); text-decoration:underline; text-underline-offset:3px;}
   .vaga-sub{margin-top:2px; font-size:12px; color:var(--wa-text-muted);}
   .tag{display:inline-block; padding:3px 10px; border-radius:999px; background:var(--wa-primary-soft); color:var(--wa-primary); font-size:11.5px; font-weight:600; white-space:nowrap;}
   .tag-verde{background:#E7F8F0; color:#00875A;}
@@ -168,7 +171,7 @@
   .vagas-galeria{display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px;}
   .vagas-galeria[hidden]{display:none;}
   .vaga-card{
-    display:flex; flex-direction:column; gap:12px; padding:20px;
+    position:relative; display:flex; flex-direction:column; gap:12px; padding:20px;
     background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px;
     box-shadow:0 1px 2px rgba(0,0,0,.04); transition:box-shadow .2s ease, transform .2s ease;
   }
@@ -183,6 +186,15 @@
     display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
   }
   .vaga-card .btn-candidatar{margin-top:auto; width:100%; padding:11px;}
+  .vaga-card-cab{padding-right:40px;}
+  /* Ícone de olho (canto superior direito): abre o detalhamento */
+  .btn-olho{
+    position:absolute; top:14px; right:14px; width:34px; height:34px; display:grid; place-items:center;
+    border:1px solid var(--wa-border); border-radius:10px; background:#fff; color:var(--wa-text-muted); cursor:pointer;
+    transition:color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .btn-olho:hover, .btn-olho:focus-visible{color:var(--wa-primary); border-color:var(--wa-primary); background:var(--wa-primary-soft);}
+  .btn-olho svg{width:17px; height:17px; stroke-width:2;}
   .vagas-vazio{grid-column:1/-1; padding:36px 20px; text-align:center; color:#94a3b8; font-size:13px; background:var(--wa-card); border:1px solid var(--wa-border); border-radius:16px;}
 
   .aviso-demo{margin:-6px 0 16px; font-size:12.5px; color:#92400E; background:#FFFBEB; border:1px solid #FDE68A; border-radius:10px; padding:9px 14px;}
@@ -216,6 +228,7 @@
   .wa-btn-secundario{background:#fff; color:var(--wa-text); border-color:#D5DBE3;}
   .wa-btn-secundario:hover{border-color:var(--wa-primary); color:var(--wa-primary);}
   .wa-btn:disabled{opacity:.65; cursor:wait;}
+  .wa-btn[hidden], #detCandidatar[hidden]{display:none;}
   .form-erro{margin-right:auto; font-size:12.5px; color:#DC2626;}
 
   .form-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 16px;}
@@ -241,6 +254,36 @@
 
   .resumo-vaga{margin-bottom:18px; padding:12px 14px; border-radius:12px; background:var(--wa-primary-soft); font-size:13px; color:var(--wa-text-muted);}
   .resumo-vaga strong{display:block; font-size:14.5px; color:var(--wa-text);}
+
+  /* ---------- Modal wizard: detalhamento da vaga ---------- */
+  .wizard-passos{display:flex; gap:10px; padding:14px 24px; border-bottom:1px solid var(--wa-border); background:#FAFBFC;}
+  .wizard-passo{
+    flex:1 1 0; display:flex; align-items:center; gap:8px; min-width:0; padding:0; border:none; background:none;
+    font:600 12.5px 'Inter',sans-serif; color:var(--wa-text-muted); cursor:pointer; white-space:nowrap;
+  }
+  .wizard-passo .num{
+    flex:0 0 26px; height:26px; border-radius:50%; display:grid; place-items:center;
+    border:2px solid var(--wa-border); background:#fff; font-size:12px; font-weight:700;
+  }
+  .wizard-passo:not(:last-child)::after{content:''; flex:1 1 auto; min-width:12px; height:2px; border-radius:2px; background:var(--wa-border);}
+  .wizard-passo.ativo{color:var(--wa-text);}
+  .wizard-passo.ativo .num{background:var(--gradiente); border-color:transparent; color:#fff;}
+  .wizard-passo.feito .num{background:#E7F8F0; border-color:transparent; color:#00875A;}
+  .wizard-passo.feito::after{background:#9BE3C3;}
+  .wizard-painel[hidden]{display:none;}
+  .wizard-painel{animation:surgir .2s ease;}
+  .wizard-progresso{margin-right:auto; font-size:12.5px; color:var(--wa-text-muted);}
+
+  .det-tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;}
+  .det-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;}
+  .det-item{padding:12px 14px; border:1px solid var(--wa-border); border-radius:12px; background:#fff;}
+  .det-item.cheio{grid-column:1/-1;}
+  .det-item span{display:block; margin-bottom:4px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--wa-text-muted);}
+  .det-item strong{display:block; font-size:14px; font-weight:600; color:var(--wa-text); overflow-wrap:anywhere;}
+  .det-texto{margin:8px 0 18px; font-size:14px; line-height:1.6; color:#334155; white-space:pre-line; overflow-wrap:anywhere;}
+  .det-texto:last-child{margin-bottom:0;}
+  .det-texto.vazio{color:#94a3b8; font-style:italic;}
+  .det-chamada{margin-top:16px; padding:12px 14px; border-radius:12px; background:var(--wa-primary-soft); font-size:13px; color:var(--wa-text-muted);}
 
   /* Tela de confirmação da candidatura */
   .confirmacao{padding:12px 8px 4px; text-align:center;}
@@ -282,7 +325,10 @@
     .modal{padding:0; align-items:flex-end;}
     .modal-caixa, .modal-caixa.estreita{width:100%; max-height:92vh; border-radius:18px 18px 0 0;}
     .modal-topo, .modal-corpo, .modal-rodape{padding-left:16px; padding-right:16px;}
-    .form-grid{grid-template-columns:1fr;}
+    .form-grid, .det-grid{grid-template-columns:1fr;}
+    .wizard-passos{padding-left:16px; padding-right:16px;}
+    .wizard-passo .rotulo{display:none;}
+    .wizard-progresso{display:none;}
   }
 </style>
 </head>
@@ -524,6 +570,30 @@
   </div>
 </div>
 
+<!-- ============ Modal wizard: detalhamento da vaga ============ -->
+<div class="modal" id="modalDetalhe" role="dialog" aria-modal="true" aria-labelledby="detTitulo" hidden>
+  <div class="modal-caixa">
+    <div class="modal-conteudo">
+      <div class="modal-topo">
+        <span class="modal-icone"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
+        <div>
+          <h2 id="detTitulo"></h2>
+          <p id="detSubtitulo"></p>
+        </div>
+        <button type="button" class="modal-fechar" data-fechar aria-label="Fechar (Esc)" title="Fechar (Esc)"><svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <nav class="wizard-passos" id="detPassos" aria-label="Etapas do detalhamento"></nav>
+      <div class="modal-corpo" id="detPaineis"></div>
+      <div class="modal-rodape">
+        <span class="wizard-progresso" id="detProgresso"></span>
+        <button type="button" class="wa-btn wa-btn-secundario" id="detAnterior">Anterior</button>
+        <button type="button" class="wa-btn wa-btn-primary" id="detProximo">Próximo</button>
+        <span id="detCandidatar"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <!-- Gerado a partir do .env por scripts/gerar_config.ps1 (fora do Git). Sem ele, a página roda em modo demonstração. -->
@@ -636,6 +706,7 @@
     let vagas = [];
     const iconeCandidatar = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
     const botaoCandidatar = v => `<button type="button" class="btn-candidatar" data-candidatar="${esc(v.id)}">Candidatar-se ${iconeCandidatar}</button>`;
+    const iconeOlho = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
 
     const filtradas = () => {
       const contrato = $('vagasFiltroContrato').value;
@@ -649,7 +720,7 @@
 
       $('vagasTableBody').innerHTML = lista.length ? lista.map(v => `
         <tr>
-          <td><div class="vaga-cargo">${esc(v.cargo)}</div><div class="vaga-sub">${esc(v.empresa)}</div></td>
+          <td><button type="button" class="vaga-cargo vaga-link" data-detalhe="${esc(v.id)}" title="Ver detalhes da vaga">${esc(v.cargo)}</button><div class="vaga-sub">${esc(v.empresa)}</div></td>
           <td><span class="tag">${esc(v.tipo_contrato)}</span></td>
           <td><span class="tag tag-verde">${esc(v.modalidade)}</span></td>
           <td>${esc(v.local)}</td>
@@ -662,7 +733,8 @@
 
       $('vagasGalleryView').innerHTML = lista.length ? lista.map(v => `
         <article class="vaga-card">
-          <div>
+          <button type="button" class="btn-olho" data-detalhe="${esc(v.id)}" aria-label="Ver detalhes da vaga ${esc(v.cargo)}" title="Ver detalhes da vaga">${iconeOlho}</button>
+          <div class="vaga-card-cab">
             <h3>${esc(v.cargo)}</h3>
             <div class="vaga-sub">${esc(v.empresa)}</div>
           </div>
@@ -715,7 +787,7 @@
       modalAberto = modal;
       modal.hidden = false;
       document.body.style.overflow = 'hidden';
-      modal.querySelector('form:not([hidden]) input, form:not([hidden]) select')?.focus();
+      (modal.querySelector('form:not([hidden]) input, form:not([hidden]) select') || modal.querySelector('.modal-fechar'))?.focus();
     };
     const fecharModal = () => {
       if (!modalAberto) return;
@@ -779,11 +851,89 @@
     const formCand = $('formCandidatura');
     let vagaSelecionada = null;
 
-    document.getElementById('vagas').addEventListener('click', e => {
+    // ---------- Detalhamento da vaga (modal wizard) ----------
+    const PASSOS = ['Visão geral', 'Atividades', 'Condições'];
+    let passoAtual = 0;
+    const item = (rotulo, valor, cheio) => `<div class="det-item${cheio ? ' cheio' : ''}"><span>${esc(rotulo)}</span><strong>${esc(valor)}</strong></div>`;
+    const texto = (valor, vazio) => valor ? `<p class="det-texto">${esc(valor)}</p>` : `<p class="det-texto vazio">${esc(vazio)}</p>`;
+
+    const irParaPasso = i => {
+      passoAtual = Math.max(0, Math.min(PASSOS.length - 1, i));
+      $('detPassos').querySelectorAll('.wizard-passo').forEach((b, n) => {
+        b.classList.toggle('ativo', n === passoAtual);
+        b.classList.toggle('feito', n < passoAtual);
+        if (n === passoAtual) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      });
+      $('detPaineis').querySelectorAll('.wizard-painel').forEach((p, n) => { p.hidden = n !== passoAtual; });
+      $('detPaineis').scrollTop = 0;
+      const ultimo = passoAtual === PASSOS.length - 1;
+      $('detAnterior').hidden = passoAtual === 0;
+      $('detProximo').hidden = ultimo;
+      $('detCandidatar').hidden = !ultimo;
+      $('detProgresso').textContent = `Etapa ${passoAtual + 1} de ${PASSOS.length}`;
+    };
+
+    const abrirDetalhe = id => {
+      const v = vagas.find(x => String(x.id) === id);
+      if (!v) return;
+      $('detTitulo').textContent = v.cargo;
+      $('detSubtitulo').textContent = `${v.empresa} · ${v.local}`;
+      $('detPassos').innerHTML = PASSOS.map((p, n) =>
+        `<button type="button" class="wizard-passo" data-passo="${n}"><span class="num">${n + 1}</span><span class="rotulo">${esc(p)}</span></button>`).join('');
+      $('detPaineis').innerHTML = `
+        <section class="wizard-painel">
+          <div class="det-tags"><span class="tag">${esc(v.tipo_contrato)}</span><span class="tag tag-verde">${esc(v.modalidade)}</span></div>
+          <div class="det-grid">
+            ${item('Cargo', v.cargo)}
+            ${item('Empresa', v.empresa)}
+            ${item('Tipo de contrato', v.tipo_contrato)}
+            ${item('Modalidade', v.modalidade)}
+            ${item('Local', v.local)}
+            ${item('Quantidade de vagas', v.quantidade || 1)}
+          </div>
+        </section>
+        <section class="wizard-painel">
+          <div class="form-secao">Descrição das atividades</div>
+          ${texto(v.descricao, 'Descrição não informada.')}
+          <div class="form-secao">Requisitos</div>
+          ${texto(v.requisitos, 'Nenhum requisito informado.')}
+        </section>
+        <section class="wizard-painel">
+          <div class="det-grid">
+            ${item('Remuneração', v.remuneracao || 'A combinar')}
+            ${item('Carga horária', v.carga_horaria || 'A combinar')}
+            ${item('Período', periodo(v), true)}
+            ${item('Benefícios', v.beneficios || 'Não informado', true)}
+          </div>
+          <div class="det-chamada">Gostou da vaga? Candidate-se agora: depois do envio você fala direto com a empresa pelo WhatsApp.</div>
+        </section>`;
+      $('detCandidatar').innerHTML = botaoCandidatar(v);
+      irParaPasso(0);
+      abrirModal($('modalDetalhe'));
+    };
+
+    $('detPassos').addEventListener('click', e => {
+      const b = e.target.closest('[data-passo]');
+      if (b) irParaPasso(Number(b.dataset.passo));
+    });
+    $('detAnterior').addEventListener('click', () => irParaPasso(passoAtual - 1));
+    $('detProximo').addEventListener('click', () => irParaPasso(passoAtual + 1));
+    // Setas do teclado navegam entre as etapas (Esc fecha, pelo handler geral dos modais).
+    document.addEventListener('keydown', e => {
+      if (modalAberto !== $('modalDetalhe')) return;
+      if (e.key === 'ArrowRight') irParaPasso(passoAtual + 1);
+      if (e.key === 'ArrowLeft') irParaPasso(passoAtual - 1);
+    });
+
+    // Cliques delegados: abrir detalhamento (tabela e galeria) e candidatar-se (listagem e modal de detalhes).
+    document.addEventListener('click', e => {
+      const det = e.target.closest('[data-detalhe]');
+      if (det) { abrirDetalhe(det.dataset.detalhe); return; }
       const btn = e.target.closest('[data-candidatar]');
       if (!btn) return;
       vagaSelecionada = vagas.find(v => String(v.id) === btn.dataset.candidatar);
       if (!vagaSelecionada) return;
+      fecharModal();
       formCand.reset();
       mostrarErro(formCand);
       $('candResumo').innerHTML = `<strong>${esc(vagaSelecionada.cargo)}</strong>${esc(vagaSelecionada.empresa)} · ${esc(vagaSelecionada.local)}`;
