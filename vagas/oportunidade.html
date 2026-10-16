@@ -228,7 +228,6 @@
   .wa-btn-secundario{background:#fff; color:var(--wa-text); border-color:#D5DBE3;}
   .wa-btn-secundario:hover{border-color:var(--wa-primary); color:var(--wa-primary);}
   .wa-btn:disabled{opacity:.65; cursor:wait;}
-  .wa-btn[hidden], #detCandidatar[hidden]{display:none;}
   .form-erro{margin-right:auto; font-size:12.5px; color:#DC2626;}
 
   .form-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 16px;}
@@ -255,25 +254,7 @@
   .resumo-vaga{margin-bottom:18px; padding:12px 14px; border-radius:12px; background:var(--wa-primary-soft); font-size:13px; color:var(--wa-text-muted);}
   .resumo-vaga strong{display:block; font-size:14.5px; color:var(--wa-text);}
 
-  /* ---------- Modal wizard: detalhamento da vaga ---------- */
-  .wizard-passos{display:flex; gap:10px; padding:14px 24px; border-bottom:1px solid var(--wa-border); background:#FAFBFC;}
-  .wizard-passo{
-    flex:1 1 0; display:flex; align-items:center; gap:8px; min-width:0; padding:0; border:none; background:none;
-    font:600 12.5px 'Inter',sans-serif; color:var(--wa-text-muted); cursor:pointer; white-space:nowrap;
-  }
-  .wizard-passo .num{
-    flex:0 0 26px; height:26px; border-radius:50%; display:grid; place-items:center;
-    border:2px solid var(--wa-border); background:#fff; font-size:12px; font-weight:700;
-  }
-  .wizard-passo:not(:last-child)::after{content:''; flex:1 1 auto; min-width:12px; height:2px; border-radius:2px; background:var(--wa-border);}
-  .wizard-passo.ativo{color:var(--wa-text);}
-  .wizard-passo.ativo .num{background:var(--gradiente); border-color:transparent; color:#fff;}
-  .wizard-passo.feito .num{background:#E7F8F0; border-color:transparent; color:#00875A;}
-  .wizard-passo.feito::after{background:#9BE3C3;}
-  .wizard-painel[hidden]{display:none;}
-  .wizard-painel{animation:surgir .2s ease;}
-  .wizard-progresso{margin-right:auto; font-size:12.5px; color:var(--wa-text-muted);}
-
+  /* ---------- Modal: detalhamento da vaga ---------- */
   .det-tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;}
   .det-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;}
   .det-item{padding:12px 14px; border:1px solid var(--wa-border); border-radius:12px; background:#fff;}
@@ -283,7 +264,7 @@
   .det-texto{margin:8px 0 18px; font-size:14px; line-height:1.6; color:#334155; white-space:pre-line; overflow-wrap:anywhere;}
   .det-texto:last-child{margin-bottom:0;}
   .det-texto.vazio{color:#94a3b8; font-style:italic;}
-  .det-chamada{margin-top:16px; padding:12px 14px; border-radius:12px; background:var(--wa-primary-soft); font-size:13px; color:var(--wa-text-muted);}
+  .det-secao{margin-top:22px;}
 
   /* Tela de confirmação da candidatura */
   .confirmacao{padding:12px 8px 4px; text-align:center;}
@@ -326,9 +307,6 @@
     .modal-caixa, .modal-caixa.estreita{width:100%; max-height:92vh; border-radius:18px 18px 0 0;}
     .modal-topo, .modal-corpo, .modal-rodape{padding-left:16px; padding-right:16px;}
     .form-grid, .det-grid{grid-template-columns:1fr;}
-    .wizard-passos{padding-left:16px; padding-right:16px;}
-    .wizard-passo .rotulo{display:none;}
-    .wizard-progresso{display:none;}
   }
 </style>
 </head>
@@ -570,7 +548,7 @@
   </div>
 </div>
 
-<!-- ============ Modal wizard: detalhamento da vaga ============ -->
+<!-- ============ Modal: detalhamento da vaga ============ -->
 <div class="modal" id="modalDetalhe" role="dialog" aria-modal="true" aria-labelledby="detTitulo" hidden>
   <div class="modal-caixa">
     <div class="modal-conteudo">
@@ -582,12 +560,9 @@
         </div>
         <button type="button" class="modal-fechar" data-fechar aria-label="Fechar (Esc)" title="Fechar (Esc)"><svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
       </div>
-      <nav class="wizard-passos" id="detPassos" aria-label="Etapas do detalhamento"></nav>
-      <div class="modal-corpo" id="detPaineis"></div>
+      <div class="modal-corpo" id="detCorpo"></div>
       <div class="modal-rodape">
-        <span class="wizard-progresso" id="detProgresso"></span>
-        <button type="button" class="wa-btn wa-btn-secundario" id="detAnterior">Anterior</button>
-        <button type="button" class="wa-btn wa-btn-primary" id="detProximo">Próximo</button>
+        <button type="button" class="wa-btn wa-btn-secundario" data-fechar>Fechar</button>
         <span id="detCandidatar"></span>
       </div>
     </div>
@@ -851,79 +826,33 @@
     const formCand = $('formCandidatura');
     let vagaSelecionada = null;
 
-    // ---------- Detalhamento da vaga (modal wizard) ----------
-    const PASSOS = ['Visão geral', 'Atividades', 'Condições'];
-    let passoAtual = 0;
+    // ---------- Detalhamento da vaga (modal) ----------
     const item = (rotulo, valor, cheio) => `<div class="det-item${cheio ? ' cheio' : ''}"><span>${esc(rotulo)}</span><strong>${esc(valor)}</strong></div>`;
     const texto = (valor, vazio) => valor ? `<p class="det-texto">${esc(valor)}</p>` : `<p class="det-texto vazio">${esc(vazio)}</p>`;
-
-    const irParaPasso = i => {
-      passoAtual = Math.max(0, Math.min(PASSOS.length - 1, i));
-      $('detPassos').querySelectorAll('.wizard-passo').forEach((b, n) => {
-        b.classList.toggle('ativo', n === passoAtual);
-        b.classList.toggle('feito', n < passoAtual);
-        if (n === passoAtual) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
-      });
-      $('detPaineis').querySelectorAll('.wizard-painel').forEach((p, n) => { p.hidden = n !== passoAtual; });
-      $('detPaineis').scrollTop = 0;
-      const ultimo = passoAtual === PASSOS.length - 1;
-      $('detAnterior').hidden = passoAtual === 0;
-      $('detProximo').hidden = ultimo;
-      $('detCandidatar').hidden = !ultimo;
-      $('detProgresso').textContent = `Etapa ${passoAtual + 1} de ${PASSOS.length}`;
-    };
 
     const abrirDetalhe = id => {
       const v = vagas.find(x => String(x.id) === id);
       if (!v) return;
       $('detTitulo').textContent = v.cargo;
       $('detSubtitulo').textContent = `${v.empresa} · ${v.local}`;
-      $('detPassos').innerHTML = PASSOS.map((p, n) =>
-        `<button type="button" class="wizard-passo" data-passo="${n}"><span class="num">${n + 1}</span><span class="rotulo">${esc(p)}</span></button>`).join('');
-      $('detPaineis').innerHTML = `
-        <section class="wizard-painel">
-          <div class="det-tags"><span class="tag">${esc(v.tipo_contrato)}</span><span class="tag tag-verde">${esc(v.modalidade)}</span></div>
-          <div class="det-grid">
-            ${item('Cargo', v.cargo)}
-            ${item('Empresa', v.empresa)}
-            ${item('Tipo de contrato', v.tipo_contrato)}
-            ${item('Modalidade', v.modalidade)}
-            ${item('Local', v.local)}
-            ${item('Quantidade de vagas', v.quantidade || 1)}
-          </div>
-        </section>
-        <section class="wizard-painel">
-          <div class="form-secao">Descrição das atividades</div>
-          ${texto(v.descricao, 'Descrição não informada.')}
-          <div class="form-secao">Requisitos</div>
-          ${texto(v.requisitos, 'Nenhum requisito informado.')}
-        </section>
-        <section class="wizard-painel">
-          <div class="det-grid">
-            ${item('Remuneração', v.remuneracao || 'A combinar')}
-            ${item('Carga horária', v.carga_horaria || 'A combinar')}
-            ${item('Período', periodo(v), true)}
-            ${item('Benefícios', v.beneficios || 'Não informado', true)}
-          </div>
-          <div class="det-chamada">Gostou da vaga? Candidate-se agora: depois do envio você fala direto com a empresa pelo WhatsApp.</div>
-        </section>`;
+      $('detCorpo').innerHTML = `
+        <div class="det-tags"><span class="tag">${esc(v.tipo_contrato)}</span><span class="tag tag-verde">${esc(v.modalidade)}</span></div>
+        <div class="det-grid">
+          ${item('Local', v.local)}
+          ${item('Quantidade de vagas', v.quantidade || 1)}
+          ${item('Remuneração', v.remuneracao || 'A combinar')}
+          ${item('Carga horária', v.carga_horaria || 'A combinar')}
+          ${item('Período', periodo(v))}
+          ${item('Benefícios', v.beneficios || 'Não informado')}
+        </div>
+        <div class="form-secao det-secao">Descrição das atividades</div>
+        ${texto(v.descricao, 'Descrição não informada.')}
+        <div class="form-secao det-secao">Requisitos</div>
+        ${texto(v.requisitos, 'Nenhum requisito informado.')}`;
       $('detCandidatar').innerHTML = botaoCandidatar(v);
-      irParaPasso(0);
       abrirModal($('modalDetalhe'));
+      $('detCorpo').scrollTop = 0;
     };
-
-    $('detPassos').addEventListener('click', e => {
-      const b = e.target.closest('[data-passo]');
-      if (b) irParaPasso(Number(b.dataset.passo));
-    });
-    $('detAnterior').addEventListener('click', () => irParaPasso(passoAtual - 1));
-    $('detProximo').addEventListener('click', () => irParaPasso(passoAtual + 1));
-    // Setas do teclado navegam entre as etapas (Esc fecha, pelo handler geral dos modais).
-    document.addEventListener('keydown', e => {
-      if (modalAberto !== $('modalDetalhe')) return;
-      if (e.key === 'ArrowRight') irParaPasso(passoAtual + 1);
-      if (e.key === 'ArrowLeft') irParaPasso(passoAtual - 1);
-    });
 
     // Cliques delegados: abrir detalhamento (tabela e galeria) e candidatar-se (listagem e modal de detalhes).
     document.addEventListener('click', e => {
