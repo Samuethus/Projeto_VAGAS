@@ -6,4 +6,4 @@ Portal de vagas estático (GitHub Pages). O banco de dados é o **Cloud Firestor
 - `firestore.rules`: regras de segurança e validação do banco.
 - `scripts/gerar_config.ps1`: gera o `config.js` a partir do `.env` (veja `.env.example`).
 
-Para conectar ao projeto Firebase, siga o passo a passo em [docs/MIGRACAO_FIREBASE.md](docs/MIGRACAO_FIREBASE.md).
+Arquitetura, configuração e operação do banco: [docs/FIREBASE.md](docs/FIREBASE.md).

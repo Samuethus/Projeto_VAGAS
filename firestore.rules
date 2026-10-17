@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Regras do banco de vagas (Firestore). Substituem o antigo supabase/schema.sql.
+// Regras do banco de vagas (Firestore): permissões e validação dos campos.
 // Publicar:  firebase deploy --only firestore:rules --project <ID_DO_PROJETO>
 // (ou colar em Console do Firebase > Firestore Database > Regras > Publicar).
 //
