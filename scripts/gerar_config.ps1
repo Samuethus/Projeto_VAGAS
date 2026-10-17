@@ -1,14 +1,15 @@
 ﻿# Gera o config.js (na raiz do projeto) a partir do .env.
 # O config.js é lido por vagas/oportunidade.html e vai para o Git (o GitHub Pages precisa dele),
-# por isso o script recusa chaves secretas: só a publishable/anon do Supabase pode ir para o navegador.
+# por isso o script recusa credenciais de servidor: só a configuração WEB do Firebase pode ir para o navegador.
 # Uso (na raiz do projeto):  powershell -ExecutionPolicy Bypass -File scripts\gerar_config.ps1
 
 $ErrorActionPreference = 'Stop'
 $raiz = Split-Path -Parent $PSScriptRoot
 $arquivoEnv = Join-Path $raiz '.env'
-$chaves = 'SUPABASE_URL', 'SUPABASE_ANON_KEY'
+$obrigatorias = 'FIREBASE_API_KEY', 'FIREBASE_PROJECT_ID', 'FIREBASE_APP_ID'
+$opcionais = @('FIREBASE_AUTH_DOMAIN')
 
-if (-not (Test-Path $arquivoEnv)) { throw "Arquivo .env não encontrado em $raiz" }
+if (-not (Test-Path $arquivoEnv)) { throw "Arquivo .env não encontrado em $raiz (copie o .env.example)" }
 
 $env_ = @{}
 foreach ($linha in Get-Content $arquivoEnv -Encoding UTF8) {
@@ -18,25 +19,21 @@ foreach ($linha in Get-Content $arquivoEnv -Encoding UTF8) {
     $env_[$chave.Trim()] = $valor.Trim().Trim('"').Trim("'")
 }
 
-$faltando = $chaves | Where-Object { -not $env_[$_] }
+$faltando = $obrigatorias | Where-Object { -not $env_[$_] }
 if ($faltando) { throw "Preencha no .env: $($faltando -join ', ')" }
 
-# Trava: o config.js é público, então a chave precisa ser a publishable/anon.
-$chave = $env_['SUPABASE_ANON_KEY']
-$ehSecreta = $chave -like 'sb_secret_*'
-if (-not $ehSecreta -and $chave -like 'eyJ*') {
-    try {
-        $p = $chave.Split('.')[1].Replace('-', '+').Replace('_', '/')
-        while ($p.Length % 4) { $p += '=' }
-        $ehSecreta = ([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json).role -ne 'anon'
-    } catch { $ehSecreta = $true }
+# Trava: o config.js é público. A apiKey web do Firebase começa com "AIza" e não dá acesso de administrador;
+# chave privada de conta de serviço (BEGIN PRIVATE KEY / private_key) nunca pode ir para o navegador.
+$chaves = $obrigatorias + $opcionais
+foreach ($c in $chaves) {
+    if ($env_[$c] -match 'PRIVATE KEY|private_key|client_email') { throw "$c no .env parece credencial de conta de serviço. Use a configuração do app WEB (Configurações do projeto > Seus apps)." }
 }
-if ($ehSecreta) { throw 'SUPABASE_ANON_KEY no .env é uma chave secreta. Use a chave publishable/anon (Project Settings > API).' }
+if ($env_['FIREBASE_API_KEY'] -notlike 'AIza*') { throw 'FIREBASE_API_KEY no .env não parece a apiKey web do Firebase (deveria começar com "AIza").' }
 
 $config = [ordered]@{}
-foreach ($c in $chaves) { $config[$c] = $env_[$c] }
+foreach ($c in $chaves) { if ($env_[$c]) { $config[$c] = $env_[$c] } }
 
-$conteudo = "// Gerado por scripts/gerar_config.ps1 a partir do .env. Não edite à mão; contém só a chave pública.`n" +
+$conteudo = "// Gerado por scripts/gerar_config.ps1 a partir do .env. Não edite à mão; contém só a configuração web (pública) do Firebase.`n" +
             "window.APP_CONFIG = $($config | ConvertTo-Json);`n"
 
 $destino = Join-Path $raiz 'config.js'

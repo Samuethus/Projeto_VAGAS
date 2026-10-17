@@ -1,0 +1,80 @@
+rules_version = '2';
+
+// Regras do banco de vagas (Firestore). Substituem o antigo supabase/schema.sql.
+// Publicar:  firebase deploy --only firestore:rules --project <ID_DO_PROJETO>
+// (ou colar em Console do Firebase > Firestore Database > Regras > Publicar).
+//
+// Visitantes (sem login) podem: ver vagas ativas, publicar vagas e se candidatar.
+// Candidaturas NÃO podem ser lidas pelo site: só pelo Console do Firebase
+// (ou por uma área logada, quando existir). Ninguém altera nem apaga pelo site.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Validações reutilizáveis ----------
+    function texto(v, max) { return v is string && v.size() > 0 && v.size() <= max; }
+    // Campo opcional: ausente, null ou texto até "max" caracteres.
+    function textoOpcional(d, campo, max) { return d.get(campo, null) == null || texto(d[campo], max); }
+    // Data opcional no formato AAAA-MM-DD (é o que o <input type="date"> envia).
+    function dataOpcional(d, campo) {
+      return d.get(campo, null) == null || (d[campo] is string && d[campo].matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'));
+    }
+    function whatsapp(v) { return v is string && v.matches('^[0-9]{10,13}$'); }
+
+    function vagaValida(d) {
+      return d.keys().hasOnly(['cargo', 'empresa', 'tipo_contrato', 'modalidade', 'local', 'quantidade',
+                               'remuneracao', 'carga_horaria', 'inicio', 'termino', 'descricao',
+                               'requisitos', 'beneficios', 'whatsapp', 'ativa', 'created_at'])
+        && texto(d.cargo, 80)
+        && texto(d.empresa, 80)
+        && d.tipo_contrato in ['Temporário', 'CLT', 'PJ', 'Estágio', 'Jovem Aprendiz', 'Freelancer']
+        && d.modalidade in ['Presencial', 'Híbrido', 'Remoto']
+        && texto(d.local, 80)
+        && d.quantidade is int && d.quantidade >= 1 && d.quantidade <= 999
+        && textoOpcional(d, 'remuneracao', 60)
+        && textoOpcional(d, 'carga_horaria', 60)
+        && dataOpcional(d, 'inicio')
+        && dataOpcional(d, 'termino')
+        && (d.get('inicio', null) == null || d.get('termino', null) == null || d.termino >= d.inicio)
+        && texto(d.descricao, 1500)
+        && textoOpcional(d, 'requisitos', 1000)
+        && textoOpcional(d, 'beneficios', 200)
+        && whatsapp(d.whatsapp)
+        && d.ativa == true
+        && d.created_at == request.time;   // o site grava serverTimestamp()
+    }
+
+    function candidaturaValida(d) {
+      return d.keys().hasOnly(['vaga_id', 'nome', 'whatsapp', 'email', 'cidade', 'disponibilidade',
+                               'apresentacao', 'consentimento', 'created_at'])
+        && d.vaga_id is string
+        && texto(d.nome, 100)
+        && whatsapp(d.whatsapp)
+        && textoOpcional(d, 'email', 120)
+        && textoOpcional(d, 'cidade', 80)
+        && d.disponibilidade in ['Imediata', 'Em até 15 dias', 'Em até 30 dias']
+        && textoOpcional(d, 'apresentacao', 1000)
+        && d.consentimento == true
+        && d.created_at == request.time
+        // Só aceita candidatura para vaga que existe e está ativa.
+        && exists(/databases/$(database)/documents/vagas/$(d.vaga_id))
+        && get(/databases/$(database)/documents/vagas/$(d.vaga_id)).data.ativa == true;
+    }
+
+    // ---------- Coleções ----------
+    match /vagas/{vagaId} {
+      allow read: if resource.data.ativa == true;          // consultas precisam filtrar ativa == true
+      allow create: if vagaValida(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    match /candidaturas/{candidaturaId} {
+      allow create: if candidaturaValida(request.resource.data);
+      allow read, update, delete: if false;
+    }
+
+    // Qualquer outra coleção fica fechada.
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}

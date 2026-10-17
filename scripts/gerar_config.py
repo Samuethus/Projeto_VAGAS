@@ -1,14 +1,15 @@
 """Gera o config.js (na raiz do projeto) a partir do .env.
 
-Versão principal: scripts/gerar_config.ps1 (que também recusa chaves secretas).
-O config.js vai para o Git: use só a chave publishable/anon do Supabase.
+Versão principal: scripts/gerar_config.ps1. As duas recusam credenciais de conta de serviço.
+O config.js vai para o Git: use só a configuração WEB do Firebase.
 Uso:  python scripts/gerar_config.py
 """
 import json
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-CHAVES = ("SUPABASE_URL", "SUPABASE_ANON_KEY")
+OBRIGATORIAS = ("FIREBASE_API_KEY", "FIREBASE_PROJECT_ID", "FIREBASE_APP_ID")
+OPCIONAIS = ("FIREBASE_AUTH_DOMAIN",)
 
 
 def ler_env(caminho: Path) -> dict:
@@ -23,15 +24,25 @@ def ler_env(caminho: Path) -> dict:
 
 
 def main() -> None:
-    env = ler_env(RAIZ / ".env")
-    faltando = [c for c in CHAVES if not env.get(c)]
+    caminho_env = RAIZ / ".env"
+    if not caminho_env.exists():
+        raise SystemExit(f"Arquivo .env não encontrado em {RAIZ} (copie o .env.example)")
+    env = ler_env(caminho_env)
+    faltando = [c for c in OBRIGATORIAS if not env.get(c)]
     if faltando:
         raise SystemExit(f"Preencha no .env: {', '.join(faltando)}")
 
-    config = {c: env[c] for c in CHAVES}
+    chaves = OBRIGATORIAS + OPCIONAIS
+    for c in chaves:
+        if any(t in env.get(c, "") for t in ("PRIVATE KEY", "private_key", "client_email")):
+            raise SystemExit(f"{c} no .env parece credencial de conta de serviço. Use a configuração do app WEB.")
+    if not env["FIREBASE_API_KEY"].startswith("AIza"):
+        raise SystemExit('FIREBASE_API_KEY no .env não parece a apiKey web do Firebase (deveria começar com "AIza").')
+
+    config = {c: env[c] for c in chaves if env.get(c)}
     destino = RAIZ / "config.js"
     destino.write_text(
-        "// Gerado por scripts/gerar_config.py a partir do .env. Não edite à mão; contém só a chave pública.\n"
+        "// Gerado por scripts/gerar_config.py a partir do .env. Não edite à mão; contém só a configuração web (pública) do Firebase.\n"
         f"window.APP_CONFIG = {json.dumps(config, indent=2)};\n",
         encoding="utf-8",
     )

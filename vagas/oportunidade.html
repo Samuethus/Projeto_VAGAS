@@ -581,7 +581,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<!-- Gerado a partir do .env por scripts/gerar_config.ps1 (fora do Git). Sem ele, a página roda em modo demonstração. -->
+<!-- Gerado a partir do .env por scripts/gerar_config.ps1. Sem as chaves do Firebase, a página roda em modo demonstração. -->
 <script src="../config.js"></script>
 <script>
   // Cabeçalho com fundo ao rolar
@@ -595,11 +595,18 @@
     const CONTRATOS = ['Temporário', 'CLT', 'PJ', 'Estágio', 'Jovem Aprendiz', 'Freelancer'];
     const MODALIDADES = ['Presencial', 'Híbrido', 'Remoto'];
 
-    // ---------- Dados: Supabase quando o config.js existe; senão, localStorage (modo demonstração) ----------
+    // ---------- Dados: Firebase (Firestore) quando o config.js tem as chaves; senão, localStorage (modo demonstração) ----------
     const cfg = window.APP_CONFIG || {};
-    const SUPA = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY
-      ? { url: cfg.SUPABASE_URL.replace(/\/+$/, ''), chave: cfg.SUPABASE_ANON_KEY }
+    const FIRE = cfg.FIREBASE_API_KEY && cfg.FIREBASE_PROJECT_ID && cfg.FIREBASE_APP_ID
+      ? {
+          apiKey: cfg.FIREBASE_API_KEY,
+          authDomain: cfg.FIREBASE_AUTH_DOMAIN || `${cfg.FIREBASE_PROJECT_ID}.firebaseapp.com`,
+          projectId: cfg.FIREBASE_PROJECT_ID,
+          appId: cfg.FIREBASE_APP_ID
+        }
       : null;
+    // SDK oficial pelo CDN do Google (versão fixa). Carregado só quando há configuração.
+    const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/12.4.0';
 
     const local = {
       ler(chave) { try { return JSON.parse(localStorage.getItem(chave)) || []; } catch { return []; } },
@@ -610,32 +617,54 @@
     };
     const novoId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 
-    const supa = async (caminho, opcoes = {}) => {
-      const r = await fetch(`${SUPA.url}/rest/v1/${caminho}`, {
-        ...opcoes,
-        headers: { apikey: SUPA.chave, Authorization: `Bearer ${SUPA.chave}`, 'Content-Type': 'application/json', ...opcoes.headers }
-      });
-      if (!r.ok) throw new Error(`Erro ${r.status} ao falar com o banco de dados.`);
-      if (r.status === 204 || opcoes.headers?.Prefer === 'return=minimal') return null;
-      return r.json();
+    // Inicializa o Firestore uma única vez (na primeira chamada). Se o SDK não carregar, tenta de novo na próxima.
+    let conexao = null;
+    const firestore = () => conexao ??= (async () => {
+      const [{ initializeApp }, fs] = await Promise.all([
+        import(`${FIREBASE_SDK}/firebase-app.js`),
+        import(`${FIREBASE_SDK}/firebase-firestore.js`)
+      ]);
+      return { db: fs.getFirestore(initializeApp(FIRE)), fs };
+    })().catch(e => { conexao = null; throw e; });
+
+    const fire = async operacao => {
+      try {
+        return await operacao(await firestore());
+      } catch (e) {
+        console.error(e);
+        throw new Error(`Não foi possível falar com o banco de dados${e.code ? ` (${e.code})` : ''}.`);
+      }
+    };
+
+    // Documento do Firestore -> objeto no formato que a tela usa (id + created_at em ISO).
+    const deDocumento = d => {
+      const dados = d.data();
+      return { ...dados, id: d.id, created_at: dados.created_at?.toDate?.().toISOString() ?? null };
     };
 
     const api = {
       async listarVagas() {
-        if (SUPA) return supa('vagas?select=*&ativa=eq.true&order=created_at.desc');
+        // As regras só liberam leitura de vagas ativas, então a consulta precisa filtrar por ativa == true.
+        // A ordenação é feita aqui para não exigir índice composto no Firestore.
+        if (FIRE) return fire(async ({ db, fs }) => {
+          const snap = await fs.getDocs(fs.query(fs.collection(db, 'vagas'), fs.where('ativa', '==', true)));
+          return snap.docs.map(deDocumento).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+        });
         return local.ler('cdl_vagas');
       },
       async criarVaga(vaga) {
-        if (SUPA) {
-          const [criada] = await supa('vagas', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(vaga) });
-          return criada;
-        }
+        if (FIRE) return fire(async ({ db, fs }) => {
+          const ref = await fs.addDoc(fs.collection(db, 'vagas'), { ...vaga, ativa: true, created_at: fs.serverTimestamp() });
+          return { ...vaga, id: ref.id, ativa: true, created_at: new Date().toISOString() };
+        });
         const criada = { ...vaga, id: novoId(), created_at: new Date().toISOString(), ativa: true };
         local.gravar('cdl_vagas', [criada, ...local.ler('cdl_vagas')]);
         return criada;
       },
       async candidatar(candidatura) {
-        if (SUPA) return supa('candidaturas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(candidatura) });
+        if (FIRE) return fire(async ({ db, fs }) => {
+          await fs.addDoc(fs.collection(db, 'candidaturas'), { ...candidatura, created_at: fs.serverTimestamp() });
+        });
         local.gravar('cdl_candidaturas', [...local.ler('cdl_candidaturas'), { ...candidatura, id: novoId(), created_at: new Date().toISOString() }]);
       }
     };
@@ -912,7 +941,7 @@
       }
     });
 
-    $('avisoDemo').hidden = !!SUPA;
+    $('avisoDemo').hidden = !!FIRE;
     carregar();
   })();
 </script>
