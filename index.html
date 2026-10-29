@@ -116,10 +116,11 @@
 
   /* Carrossel: a janela recorta as páginas; o respiro interno (compensado pela margem negativa)
      deixa o card em destaque crescer e projetar sombra sem ser cortado. */
-  .vitrine{--pontos:56px; position:relative; margin-top:clamp(40px,6vh,56px); padding-right:var(--pontos);}
+  /* --escala: o bloco dos cards fica 10% menor por inteiro (largura, altura, recorte, seta e textos), mantendo as proporções. */
+  .vitrine{--escala:.9; --pontos:56px; width:calc(100% * var(--escala)); margin-inline:auto; position:relative; margin-top:clamp(40px,6vh,56px); padding-right:var(--pontos);}
   .vitrine-janela{overflow:hidden; padding:56px 24px 84px; margin:-56px -24px -84px;}
   .vitrine-trilho{
-    --por:3; --gap:28px; --pag:0;
+    --por:3; --gap:calc(28px * var(--escala)); --pag:0;
     display:flex; gap:var(--gap); touch-action:pan-y;
     transform:translateX(calc(var(--pag) * -1 * (100% + var(--gap))));
     transition:transform .6s cubic-bezier(.22,.7,.2,1);
@@ -127,17 +128,19 @@
   /* Card em foto inteira com o texto sobreposto e um recorte no canto superior direito para a seta.
      O card do meio (foco) sobe um pouco, formando o escalonado do modelo. */
   .vcard{
-    --sobe:0px; --corte:64px; --curva:16px;
+    /* Recorte em pixels inteiros: medidas fracionadas deixam frestas entre as partes da máscara. */
+    --sobe:0px; --corte:round(calc(64px * var(--escala)), 1px); --curva:round(calc(16px * var(--escala)), 1px);
     position:relative; flex:0 0 calc((100% - (var(--por) - 1) * var(--gap)) / var(--por));
     transform:translateY(var(--sobe));
     transition:transform .35s cubic-bezier(.22,.7,.2,1), filter .35s ease;
   }
-  .vcard.foco{--sobe:-28px;}
+  .vcard.foco{--sobe:calc(-28px * var(--escala));}
+  /* Passar o mouse: só uma sombra difusa e um leve deslocamento para cima. */
   .vcard:hover,.vcard:focus-within{
-    z-index:2; transform:translateY(calc(var(--sobe) - 8px)) scale(1.03);
-    filter:drop-shadow(0 30px 34px rgba(2,43,83,.38));
+    z-index:2; transform:translateY(calc(var(--sobe) - 4px));
+    filter:drop-shadow(0 18px 26px rgba(2,43,83,.3));
   }
-  .vcard-link{position:relative; display:block; height:clamp(240px,calc(100vh - var(--desconto)),560px); height:clamp(240px,calc(100svh - var(--desconto)),560px); border-radius:var(--raio); outline:none;}
+  .vcard-link{position:relative; display:block; height:calc(clamp(240px,calc(100vh - var(--desconto)),560px) * var(--escala)); height:calc(clamp(240px,calc(100svh - var(--desconto)),560px) * var(--escala)); border-radius:var(--raio); outline:none;}
   .vcard-link:focus-visible{outline:3px solid var(--azul-royal); outline-offset:4px;}
   /* Máscara: união de retângulos e quartos de círculo que desenham o recorte com cantos arredondados. */
   .vcard-foto{
@@ -160,25 +163,21 @@
       radial-gradient(circle at bottom left,#000 var(--curva),#0000 calc(var(--curva) + .5px)) right 0 top var(--corte) / var(--curva) var(--curva) no-repeat,
       radial-gradient(circle at top right,#0000 var(--curva),#000 calc(var(--curva) + .5px)) right calc(var(--corte) - var(--curva)) top calc(var(--corte) - var(--curva)) / var(--curva) var(--curva) no-repeat;
   }
-  .vcard-foto img{width:100%; height:100%; object-fit:cover; display:block; transition:transform .5s ease;}
+  .vcard-foto img{width:100%; height:100%; object-fit:cover; display:block;}
   .vcard-foto::after{content:""; position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(to top,rgba(1,26,51,.88) 0%,rgba(1,26,51,.45) 38%,rgba(1,26,51,0) 62%);}
-  .vcard:hover .vcard-foto img,.vcard:focus-within .vcard-foto img{transform:scale(1.06);}
-  .vcard-texto{position:absolute; z-index:1; left:0; right:0; bottom:0; padding:0 24px 24px; color:#fff;}
-  .vcard h3{font-size:21px; line-height:1.25;}
+  .vcard-texto{position:absolute; z-index:1; left:0; right:0; bottom:0; padding:0 calc(24px * var(--escala)) calc(24px * var(--escala)); color:#fff;}
+  .vcard h3{font-size:calc(21px * var(--escala)); line-height:1.25;}
   .vcard p{
-    color:rgba(255,255,255,.82); font-size:13.5px; line-height:1.55; margin-top:8px;
+    color:rgba(255,255,255,.82); font-size:calc(13.5px * var(--escala)); line-height:1.55; margin-top:calc(8px * var(--escala));
     display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden;
   }
   .vcard-seta{
-    position:absolute; top:0; right:0; width:calc(var(--corte) - 10px); height:calc(var(--corte) - 10px);
+    position:absolute; top:0; right:0; width:calc(var(--corte) - 10px * var(--escala)); height:calc(var(--corte) - 10px * var(--escala));
     display:flex; align-items:center; justify-content:center; border-radius:50%;
-    background:var(--amber-bg); color:var(--text-dark); box-shadow:0 8px 18px -8px rgba(2,43,83,.45);
-    transition:transform .25s ease, background .25s ease;
+    background:var(--gradiente); color:#fff; box-shadow:0 10px 22px -10px rgba(0,80,162,.7);
   }
-  .vcard-seta svg{width:22px; height:22px; transition:transform .25s ease;}
-  .vcard:hover .vcard-seta,.vcard:focus-within .vcard-seta{background:#FFD95C; transform:scale(1.06);}
-  .vcard:hover .vcard-seta svg,.vcard:focus-within .vcard-seta svg{transform:rotate(45deg);}
+  .vcard-seta svg{width:calc(22px * var(--escala)); height:calc(22px * var(--escala));}
 
   .vitrine-pontos{position:absolute; z-index:3; right:0; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:12px;}
   .vitrine-pontos[hidden]{display:none;}
