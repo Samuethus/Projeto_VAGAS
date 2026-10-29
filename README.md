@@ -1,9 +1,10 @@
 # Projeto_VAGAS
 
-Portal de vagas estático (GitHub Pages). O banco de dados é o **Cloud Firestore** (Firebase).
+Portal de vagas estático (GitHub Pages). O banco de dados é o **Supabase** (Postgres).
 
 - `vagas/oportunidade.html`: cadastro, listagem e candidatura às vagas.
-- `firestore.rules`: regras de segurança e validação do banco.
+- `supabase/schema.sql`: tabelas, permissões e validação do banco.
 - `scripts/gerar_config.ps1`: gera o `config.js` a partir do `.env` (veja `.env.example`).
+- `scripts/migrar_firebase.ps1`: exporta as vagas do Firebase antigo para o Supabase.
 
-Arquitetura, configuração e operação do banco: [docs/FIREBASE.md](docs/FIREBASE.md).
+Arquitetura, configuração e operação do banco: [docs/SUPABASE.md](docs/SUPABASE.md).

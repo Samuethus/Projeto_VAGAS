@@ -9,15 +9,14 @@ links_power.txt
 !.env.example
 # .mcp.json só tem o endereço do MCP do Survey Monkey (login por OAuth, sem token)
 !.mcp.json
-# firebase.json só aponta para o arquivo de regras (sem chaves).
-!firebase.json
-# Credenciais de conta de serviço do Firebase NUNCA vão para o Git.
+# Credenciais de conta de serviço do Firebase antigo NUNCA vão para o Git.
 *serviceAccount*
 *firebase-adminsdk*
 # config.js (gerado do .env) VAI para o Git de propósito: o site no GitHub Pages precisa dele.
-# Só pode conter a configuração WEB do Firebase (apiKey, projectId, appId...). NUNCA uma conta de serviço.
-.firebase/
-firebase-debug.log
+# Só pode conter a URL e a chave PUBLISHABLE do Supabase. NUNCA a chave secret / service_role.
+# Dados exportados do Firestore pela migração (scripts/migrar_firebase.ps1): ficam só na máquina.
+supabase/migracao_firebase.sql
+supabase/.temp/
 *.pem
 *.key
 

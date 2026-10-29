@@ -1,15 +1,16 @@
 """Gera o config.js (na raiz do projeto) a partir do .env.
 
-Versão principal: scripts/gerar_config.ps1. As duas recusam credenciais de conta de serviço.
-O config.js vai para o Git: use só a configuração WEB do Firebase.
+Versão principal: scripts/gerar_config.ps1. As duas recusam chaves secretas do Supabase.
+O config.js vai para o Git: use só a chave PUBLISHABLE (ou anon).
 Uso:  python scripts/gerar_config.py
 """
+import base64
 import json
+import re
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-OBRIGATORIAS = ("FIREBASE_API_KEY", "FIREBASE_PROJECT_ID", "FIREBASE_APP_ID")
-OPCIONAIS = ("FIREBASE_AUTH_DOMAIN",)
+CHAVES = ("SUPABASE_URL", "SUPABASE_KEY")
 
 
 def ler_env(caminho: Path) -> dict:
@@ -23,26 +24,39 @@ def ler_env(caminho: Path) -> dict:
     return valores
 
 
+def papel_jwt(key: str):
+    partes = key.split(".")
+    if len(partes) != 3:
+        return None
+    try:
+        payload = partes[1] + "=" * (-len(partes[1]) % 4)
+        return json.loads(base64.urlsafe_b64decode(payload)).get("role")
+    except ValueError:
+        return None
+
+
 def main() -> None:
     caminho_env = RAIZ / ".env"
     if not caminho_env.exists():
         raise SystemExit(f"Arquivo .env não encontrado em {RAIZ} (copie o .env.example)")
     env = ler_env(caminho_env)
-    faltando = [c for c in OBRIGATORIAS if not env.get(c)]
+    faltando = [c for c in CHAVES if not env.get(c)]
     if faltando:
         raise SystemExit(f"Preencha no .env: {', '.join(faltando)}")
 
-    chaves = OBRIGATORIAS + OPCIONAIS
-    for c in chaves:
-        if any(t in env.get(c, "") for t in ("PRIVATE KEY", "private_key", "client_email")):
-            raise SystemExit(f"{c} no .env parece credencial de conta de serviço. Use a configuração do app WEB.")
-    if not env["FIREBASE_API_KEY"].startswith("AIza"):
-        raise SystemExit('FIREBASE_API_KEY no .env não parece a apiKey web do Firebase (deveria começar com "AIza").')
+    if not re.fullmatch(r"https://[^/]+/?", env["SUPABASE_URL"]):
+        raise SystemExit("SUPABASE_URL no .env deve ser só o endereço do projeto, como https://abcdefgh.supabase.co")
+    key = env["SUPABASE_KEY"]
+    papel = papel_jwt(key)
+    if key.startswith("sb_secret_") or papel == "service_role":
+        raise SystemExit("SUPABASE_KEY no .env é uma chave SECRETA. Use a chave publishable (Project Settings > API Keys).")
+    if not key.startswith("sb_publishable_") and papel != "anon":
+        raise SystemExit('SUPABASE_KEY no .env não parece a chave publishable do Supabase (deveria começar com "sb_publishable_").')
 
-    config = {c: env[c] for c in chaves if env.get(c)}
+    config = {c: env[c].rstrip("/") for c in CHAVES}
     destino = RAIZ / "config.js"
     destino.write_text(
-        "// Gerado por scripts/gerar_config.py a partir do .env. Não edite à mão; contém só a configuração web (pública) do Firebase.\n"
+        "// Gerado por scripts/gerar_config.py a partir do .env. Não edite à mão; contém só a configuração pública do Supabase.\n"
         f"window.APP_CONFIG = {json.dumps(config, indent=2)};\n",
         encoding="utf-8",
     )

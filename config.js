@@ -1,7 +1,5 @@
-// Gerado por scripts/gerar_config.ps1 a partir do .env. Não edite à mão; contém só a configuração web (pública) do Firebase.
+// Gerado por scripts/gerar_config.ps1 a partir do .env. Não edite à mão; contém só a configuração pública do Supabase.
 window.APP_CONFIG = {
-    "FIREBASE_API_KEY":  "AIzaSyBAdGP5s3Qb-_VM8TBP_knYAnrj0Kd2hY8",
-    "FIREBASE_PROJECT_ID":  "projeto-vagas-3e07a",
-    "FIREBASE_APP_ID":  "1:803467483854:web:3fe4b2ac68a7d4140ace9f",
-    "FIREBASE_AUTH_DOMAIN":  "projeto-vagas-3e07a.firebaseapp.com"
+    "SUPABASE_URL":  "https://xjexujpvnahaugizeyee.supabase.co",
+    "SUPABASE_KEY":  "sb_publishable_PlkIL_pJ3tpg3WZvpxTkpg_yTbLdZqA"
 };
