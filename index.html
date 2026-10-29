@@ -54,7 +54,8 @@
   svg{flex:0 0 auto;}
   /* Reserva o espaço da barra de rolagem: o cabeçalho fica na mesma posição em todas as páginas, curtas ou longas. */
   html{scrollbar-gutter:stable;}
-  .container{width:min(1180px,100% - 32px); margin-inline:auto;}
+  /* Ocupa quase toda a largura da tela: só um respiro lateral proporcional (16px a 40px de cada lado). */
+  .container{width:calc(100% - clamp(32px,4vw,80px)); max-width:1840px; margin-inline:auto;}
   .secao{padding:96px 0;}
   .secao-titulo{text-align:center; font-size:clamp(28px,4vw,44px); line-height:1.15; max-width:720px; margin:0 auto;}
   .secao-sub{text-align:center; color:var(--text-muted); max-width:540px; margin:14px auto 0; line-height:1.6; font-size:15px;}
@@ -145,7 +146,7 @@
     z-index:2; transform:translateY(calc(var(--sobe) - 8px)) scale(1.03);
     filter:drop-shadow(0 30px 34px rgba(2,43,83,.38));
   }
-  .vcard-link{position:relative; display:block; height:clamp(240px,calc(100vh - var(--desconto)),480px); height:clamp(240px,calc(100svh - var(--desconto)),480px); border-radius:var(--raio); outline:none;}
+  .vcard-link{position:relative; display:block; height:clamp(240px,calc(100vh - var(--desconto)),560px); height:clamp(240px,calc(100svh - var(--desconto)),560px); border-radius:var(--raio); outline:none;}
   .vcard-link:focus-visible{outline:3px solid var(--azul-royal); outline-offset:4px;}
   /* Máscara: união de retângulos e quartos de círculo que desenham o recorte com cantos arredondados. */
   .vcard-foto{
@@ -190,6 +191,8 @@
 
   .vitrine-pontos{position:absolute; z-index:3; right:0; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:12px;}
   .vitrine-pontos[hidden]{display:none;}
+  /* Sem pontos (todos os cards cabem numa página), a coluna reservada a eles é liberada para os cards. */
+  .vitrine:has(.vitrine-pontos[hidden]){--pontos:0px;}
   /* Oculto temporariamente: seções abaixo do carrossel aguardam o ajuste fino do projeto. Remova a classe para reexibir. */
   .oculto{display:none !important;}
   .vitrine-pontos button{width:10px; height:10px; padding:0; border:0; border-radius:50%; background:var(--grey); cursor:pointer; transition:background .2s ease, transform .2s ease;}
