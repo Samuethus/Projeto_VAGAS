@@ -50,7 +50,7 @@
     /* Coluna da altura da tela: o aviso de direitos autorais fica sempre no pé, sem gerar rolagem. */
     min-height:100vh; min-height:100svh; display:flex; flex-direction:column;
   }
-  main{flex:1 0 auto;}
+  main{flex:1 0 auto; display:flex; flex-direction:column;}
   h1,h2,h3{font-family:'Poppins','Inter',sans-serif; font-weight:500; letter-spacing:-.02em; margin:0;}
   p{margin:0;}
   a{color:inherit; text-decoration:none;}
@@ -110,8 +110,10 @@
   /* ---------- 1. Introdução: vitrine em carrossel de três colunas ---------- */
   /* Início cabe inteiro na tela: espaçamentos e altura dos cards acompanham a altura da janela.
      --desconto é o espaço do cabeçalho, título e respiros, descontado da altura dos cards. */
-  .hero{--desconto:340px; position:relative; padding:clamp(16px,4vh,40px) 0; overflow:hidden;}
-  .hero-cab{text-align:center; margin:0 auto;}
+  .hero{--desconto:340px; position:relative; flex:1 0 auto; display:flex; flex-direction:column; padding:clamp(16px,4vh,40px) 0; overflow:hidden;}
+  /* Os cards ficam centralizados na vertical no espaço entre o subtítulo e o aviso do rodapé. */
+  .hero > .container{flex:1 0 auto; display:flex; flex-direction:column;}
+  .hero-cab{text-align:center; margin:0 auto clamp(40px,6vh,56px);}
   /* Título sempre em uma linha: a fonte acompanha a largura da tela até o teto de 56px. */
   .hero h1{font-size:clamp(18px,min(5.2vw,7vh),56px); line-height:1.08; white-space:nowrap;}
   .hero h1 em{font-style:italic; font-weight:400;}
@@ -120,7 +122,7 @@
   /* Carrossel: a janela recorta as páginas; o respiro interno (compensado pela margem negativa)
      deixa o card em destaque crescer e projetar sombra sem ser cortado. */
   /* --escala: o bloco dos cards fica 10% menor por inteiro (largura, altura, recorte, seta e textos), mantendo as proporções. */
-  .vitrine{--escala:.9; --pontos:56px; width:calc(100% * var(--escala)); margin-inline:auto; position:relative; margin-top:clamp(40px,6vh,56px); padding-right:var(--pontos);}
+  .vitrine{--escala:.9; --pontos:56px; width:calc(100% * var(--escala)); margin:auto; position:relative; padding-right:var(--pontos);}
   .vitrine-janela{overflow:hidden; padding:56px 24px 84px; margin:-56px -24px -84px;}
   .vitrine-trilho{
     --por:3; --gap:calc(28px * var(--escala)); --pag:0;
@@ -430,11 +432,11 @@
     </a>
     <div class="topo-acoes">
       <nav class="redes" aria-label="Redes sociais da CDL Cuiabá">
-        <a href="#" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V10H6.5v3.5H9V21h3.5v-7.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15z"/></svg></a>
-        <a href="#" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
-        <a href="#" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V17M8 7.5v.01M12 17v-6.5M12 13.5a2.5 2.5 0 0 1 5 0V17"/></svg></a>
-        <a href="#" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="m10 9.2 5 2.8-5 2.8z" fill="currentColor"/></svg></a>
-        <a href="#" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12Z"/><path d="M9 8.5c0 3.6 2.9 6.5 6.5 6.5l1-1.6-2-1-1 1a4 4 0 0 1-2.4-2.4l1-1-1-2z" fill="currentColor" stroke-width="1"/></svg></a>
+        <a href="https://www.facebook.com/cdl.cuiaba/?locale=pt_BR" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V10H6.5v3.5H9V21h3.5v-7.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15z"/></svg></a>
+        <a href="https://www.instagram.com/cdlcuiaba/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
+        <a href="https://www.linkedin.com/company/cdl-cuiaba/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V17M8 7.5v.01M12 17v-6.5M12 13.5a2.5 2.5 0 0 1 5 0V17"/></svg></a>
+        <a href="https://www.youtube.com/@CDLCuiabaoficial" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="m10 9.2 5 2.8-5 2.8z" fill="currentColor"/></svg></a>
+        <a href="https://wa.me/5565996948735" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12Z"/><path d="M9 8.5c0 3.6 2.9 6.5 6.5 6.5l1-1.6-2-1-1 1a4 4 0 0 1-2.4-2.4l1-1-1-2z" fill="currentColor" stroke-width="1"/></svg></a>
       </nav>
       <a class="entrar" href="../index.html" aria-label="Entrar" title="Entrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
     </div>

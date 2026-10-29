@@ -1,6 +1,6 @@
 # Redes sociais do cabeçalho
 
-O cabeçalho do `index.html` mostra cinco ícones de redes sociais da CDL Cuiabá. Por enquanto todos apontam para `#`, ou seja, não abrem nada. Preencha a tabela abaixo com os endereços oficiais; depois eles serão aplicados no site.
+O cabeçalho do `index.html` mostra cinco ícones de redes sociais da CDL Cuiabá. Os endereços oficiais abaixo já estão aplicados no site. Para trocar algum, edite a tabela e peça a atualização (ou siga a seção 2).
 
 ---
 
@@ -10,11 +10,11 @@ Preencha a coluna **Link** com o endereço completo, começando por `https://`. 
 
 | Rede | Link | Exemplo de formato |
 |---|---|---|
-| Facebook |  | `https://www.facebook.com/nome-da-pagina` |
-| Instagram |  | `https://www.instagram.com/perfil` |
-| LinkedIn |  | `https://www.linkedin.com/company/nome-da-empresa` |
-| YouTube |  | `https://www.youtube.com/@canal` |
-| WhatsApp |  | `https://wa.me/5565999999999` (55 + DDD + número, só dígitos) |
+| Facebook | https://www.facebook.com/cdl.cuiaba/?locale=pt_BR | `https://www.facebook.com/nome-da-pagina` |
+| Instagram | https://www.instagram.com/cdlcuiaba/ | `https://www.instagram.com/perfil` |
+| LinkedIn | https://www.linkedin.com/company/cdl-cuiaba/ | `https://www.linkedin.com/company/nome-da-empresa` |
+| YouTube | https://www.youtube.com/@CDLCuiabaoficial | `https://www.youtube.com/@canal` |
+| WhatsApp | https://wa.me/5565996948735 | `https://wa.me/5565999999999` (55 + DDD + número, só dígitos) |
 
 ### Quer incluir outra rede?
 
