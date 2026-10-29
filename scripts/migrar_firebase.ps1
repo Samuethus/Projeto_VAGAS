@@ -26,7 +26,10 @@ function Literal($valor) {
     if ($valor.PSObject.Properties.Name -contains 'booleanValue') { return $(if ($valor.booleanValue) { 'true' } else { 'false' }) }
     if ($valor.PSObject.Properties.Name -contains 'integerValue') { return [string][long]$valor.integerValue }
     $texto = if ($valor.PSObject.Properties.Name -contains 'timestampValue') { $valor.timestampValue } else { [string]$valor.stringValue }
-    return "'" + $texto.Replace("'", "''") + "'"
+    # Quebras de linha viram escapes (E'...\n...'): colar no SQL Editor pelo Windows trocaria LF por CRLF,
+    # aumentando o tamanho do texto e podendo estourar os limites de caracteres.
+    $texto = $texto.Replace('\', '\\').Replace("'", "''").Replace("`r", '\r').Replace("`n", '\n')
+    return "E'" + $texto + "'"
 }
 
 $linhas = foreach ($d in $documentos) {
