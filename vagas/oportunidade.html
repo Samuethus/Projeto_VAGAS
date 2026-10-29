@@ -296,18 +296,22 @@
     .pagina{padding:18px 16px 40px;}
   }
   @media (max-width:640px){
-    .marca{--h:26px; gap:12px;}
+    .marca{--h:22px; gap:10px;}
     .topo .container{height:64px;}
-    .topo-acoes{gap:10px;}
+    .topo-acoes{gap:8px;}
     .redes{gap:0;}
-    .redes a{width:30px; height:30px;}
+    .redes a{width:26px; height:26px;}
     .redes svg{width:15px; height:15px;}
-    .entrar{width:38px; height:38px;}
+    .entrar{width:36px; height:36px;}
     .wa-view-toggle-btn span{display:none;}
-    .filter-bar{flex-wrap:wrap; height:auto; row-gap:10px; overflow:visible;}
-    .filter-select{flex:1 1 40%;}
+    /* Barra de filtros em uma linha só: filtros dividem o espaço, switch e "Nova vaga" ficam só com o ícone. */
+    .filter-bar{column-gap:6px; padding:8px; overflow:visible;}
+    .filter-select{min-width:0; font-size:12px; padding:9px 24px 9px 10px; background-position:right 8px center; text-overflow:ellipsis;}
     .filter-spacer, .filter-divider{display:none;}
-    .filter-bar .wa-btn-primary{flex:1 1 auto; justify-content:center;}
+    .wa-view-toggle-btn{padding:8px 9px;}
+    .filter-bar .wa-btn-primary{width:38px; height:38px; padding:0; justify-content:center;}
+    .filter-bar .wa-btn-primary span{display:none;}
+    .filter-bar .wa-btn-primary svg{width:18px; height:18px;}
     .modal{padding:0; align-items:flex-end;}
     .modal-caixa, .modal-caixa.estreita{width:100%; max-height:92vh; border-radius:18px 18px 0 0;}
     .modal-topo, .modal-corpo, .modal-rodape{padding-left:16px; padding-right:16px;}
@@ -358,9 +362,9 @@
         <span>Tabela</span>
       </button>
     </div>
-    <button type="button" class="wa-btn wa-btn-primary" id="btnNovaVaga">
+    <button type="button" class="wa-btn wa-btn-primary" id="btnNovaVaga" aria-label="Nova vaga" title="Nova vaga">
       <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      Nova vaga
+      <span>Nova vaga</span>
     </button>
   </div>
 
