@@ -47,7 +47,10 @@
     color:var(--text-dark);
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
+    /* Coluna da altura da tela: o aviso de direitos autorais fica sempre no pé, sem gerar rolagem. */
+    min-height:100vh; min-height:100svh; display:flex; flex-direction:column;
   }
+  main{flex:1 0 auto;}
   h1,h2,h3{font-family:'Poppins','Inter',sans-serif; font-weight:500; letter-spacing:-.02em; margin:0;}
   p{margin:0;}
   a{color:inherit; text-decoration:none;}
@@ -107,7 +110,7 @@
   /* ---------- 1. Introdução: vitrine em carrossel de três colunas ---------- */
   /* Início cabe inteiro na tela: espaçamentos e altura dos cards acompanham a altura da janela.
      --desconto é o espaço do cabeçalho, título e respiros, descontado da altura dos cards. */
-  .hero{--desconto:294px; position:relative; padding:clamp(16px,4vh,40px) 0; overflow:hidden;}
+  .hero{--desconto:340px; position:relative; padding:clamp(16px,4vh,40px) 0; overflow:hidden;}
   .hero-cab{text-align:center; margin:0 auto;}
   /* Título sempre em uma linha: a fonte acompanha a largura da tela até o teto de 56px. */
   .hero h1{font-size:clamp(18px,min(5.2vw,7vh),56px); line-height:1.08; white-space:nowrap;}
@@ -364,6 +367,10 @@
   .rodape-colunas h4{margin:0 0 14px; font:600 14.5px 'Inter',sans-serif;}
   .rodape-colunas a{display:block; font-size:13.5px; color:rgba(255,255,255,.6); margin-bottom:10px;}
   .rodape-colunas a:hover{color:#fff;}
+  /* Aviso de direitos autorais: faixa fina no pé da tela, separada por uma linha como o cabeçalho. */
+  .aviso{background:var(--branco); border-top:1px solid var(--borda);}
+  .aviso p{padding:12px 0; text-align:center; font-size:12px; line-height:1.5; color:var(--text-muted);}
+  .aviso strong{font-weight:600; color:#38404b;}
   .copyright{text-align:center; font-size:13px; color:rgba(255,255,255,.75); margin-top:36px;}
 
   /* ---------- Aparição suave ---------- */
@@ -377,7 +384,7 @@
 
   /* ---------- Responsivo ---------- */
   @media (max-width:1024px){
-    .hero{--desconto:344px;}
+    .hero{--desconto:400px;}
     .vitrine{--pontos:0px;}
     .vitrine-trilho{--por:2;}
     .vitrine-pontos{position:relative; right:auto; top:auto; transform:none; flex-direction:row; justify-content:center; margin-top:28px;}
@@ -701,6 +708,13 @@
   </section>
 </main>
 
+<!-- ============ Aviso de direitos autorais ============ -->
+<footer class="aviso">
+  <div class="container">
+    <p>© <span data-ano>2026</span> <strong>CDL Cuiabá</strong> · NIM – Núcleo de Inteligência. Todos os direitos reservados. Conteúdo, marcas e imagens protegidos pela Lei nº 9.610/1998; reprodução proibida sem autorização.</p>
+  </div>
+</footer>
+
 <!-- ============ 6. Rodapé ============ -->
 <footer class="rodape oculto" id="contato">
   <div class="container">
@@ -759,7 +773,7 @@
       </div>
     </div>
 
-    <p class="copyright">© <span id="ano">2026</span> NIM · Núcleo de Inteligência. Todos os direitos reservados.</p>
+    <p class="copyright">© <span data-ano>2026</span> NIM · Núcleo de Inteligência. Todos os direitos reservados.</p>
   </div>
 </footer>
 
@@ -881,7 +895,7 @@
     atualizar();
   })();
 
-  document.getElementById('ano').textContent = new Date().getFullYear();
+  document.querySelectorAll('[data-ano]').forEach(el => { el.textContent = new Date().getFullYear(); });
 </script>
 </body>
 </html>
