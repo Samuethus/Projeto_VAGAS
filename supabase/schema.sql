@@ -1,9 +1,10 @@
 -- Banco do portal de vagas (Supabase / Postgres): tabelas, validação dos campos e permissões (RLS).
 -- Rodar uma vez em: Supabase > SQL Editor > New query > colar tudo > Run. Pode ser rodado de novo sem perder dados.
 --
--- Visitantes (chave publishable, papel "anon") podem: ver vagas ativas, publicar vagas e se candidatar.
+-- Visitantes (chave publishable, papel "anon") podem: ver vagas ativas e se candidatar.
+-- Vagas são cadastradas SÓ pelo projeto CDLOAD (com a chave secret, no servidor, que ignora estas permissões).
 -- Candidaturas NÃO podem ser lidas pelo site: só pelo painel do Supabase (Table Editor).
--- Ninguém altera nem apaga pelo site.
+-- Ninguém cadastra vaga, altera nem apaga pelo site.
 
 -- ---------- Tabelas ----------
 -- O id é texto para manter os IDs das vagas que vieram do Firestore; vagas novas recebem um UUID.
@@ -45,21 +46,19 @@ create index if not exists vagas_ativa_created_at on public.vagas (ativa, create
 create index if not exists candidaturas_vaga_id on public.candidaturas (vaga_id);
 
 -- ---------- Data do servidor ----------
--- Quem grava pelo site não escolhe created_at nem cria vaga inativa (equivale ao serverTimestamp() do Firestore).
--- O painel e o SQL Editor (papel postgres) ficam livres, para a migração manter as datas originais.
+-- Quem se candidata pelo site não escolhe created_at (equivale ao serverTimestamp() do Firestore).
+-- O painel, o SQL Editor e o CDLOAD ficam livres, para a migração manter as datas originais.
 create or replace function public.fixar_dados_do_servidor() returns trigger
 language plpgsql set search_path = '' as $$
 begin
   if current_user in ('anon', 'authenticated') then
     new.created_at := now();
-    if tg_table_name = 'vagas' then new.ativa := true; end if;
   end if;
   return new;
 end $$;
 
+-- O cadastro de vagas saiu do site; o gatilho que forçava ativa/created_at em vagas não é mais necessário.
 drop trigger if exists vagas_dados_do_servidor on public.vagas;
-create trigger vagas_dados_do_servidor before insert on public.vagas
-  for each row execute function public.fixar_dados_do_servidor();
 
 drop trigger if exists candidaturas_dados_do_servidor on public.candidaturas;
 create trigger candidaturas_dados_do_servidor before insert on public.candidaturas
@@ -70,16 +69,15 @@ alter table public.vagas enable row level security;
 alter table public.candidaturas enable row level security;
 
 revoke all on public.vagas, public.candidaturas from anon, authenticated;
-grant select, insert on public.vagas to anon, authenticated;
+grant select on public.vagas to anon, authenticated;
 grant insert on public.candidaturas to anon, authenticated;
 
 drop policy if exists "ver vagas ativas" on public.vagas;
 create policy "ver vagas ativas" on public.vagas
   for select to anon, authenticated using (ativa);
 
+-- Remove a permissão de cadastro que existia quando o site publicava vagas.
 drop policy if exists "publicar vaga" on public.vagas;
-create policy "publicar vaga" on public.vagas
-  for insert to anon, authenticated with check (ativa);
 
 -- Só aceita candidatura para vaga que existe e está ativa.
 drop policy if exists "candidatar" on public.candidaturas;

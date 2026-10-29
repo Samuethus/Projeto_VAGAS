@@ -9,10 +9,14 @@ Todo o ecossistema de dados do portal de vagas roda no **Supabase**, projeto `xj
 O site é estático (GitHub Pages, sem build e sem servidor próprio). Quem fala com o banco é o navegador do visitante:
 
 ```
-Navegador ──(fetch na API REST do Supabase)──► Postgres
-                                                  │
-                         supabase/schema.sql (RLS + checks) decide o que é permitido
+CDLOAD (cadastro de vagas) ──(chave secret, no servidor)──┐
+                                                          ▼
+Navegador ──(fetch na API REST, chave publishable)──► Postgres
+                                                          │
+                         supabase/schema.sql (RLS + checks) decide o que o site pode fazer
 ```
+
+> **O cadastro de vagas não faz parte deste projeto.** As vagas são cadastradas, alteradas e desativadas pelo projeto **CDLOAD**. Este site só lista vagas e recebe candidaturas.
 
 | Peça | Onde |
 |---|---|
@@ -23,14 +27,14 @@ Navegador ──(fetch na API REST do Supabase)──► Postgres
 
 ### Permissões
 
-- O visitante **vê** vagas ativas, **publica** vagas e **se candidata**.
+- O visitante **vê** vagas ativas e **se candidata**.
+- Ninguém cadastra, altera nem apaga vagas pelo site (o banco recusa, mesmo chamando a API direto).
 - Ninguém lê candidaturas pelo site; elas só aparecem no painel do Supabase.
-- Ninguém altera nem apaga dados pelo site.
-- `created_at` é sempre a data do servidor, e toda vaga publicada pelo site nasce com `ativa = true`.
+- O `created_at` da candidatura é sempre a data do servidor.
 
 ### Modo demonstração
 
-Se o `config.js` estiver sem as chaves, a página salva tudo no `localStorage` do navegador e mostra um aviso amarelo.
+Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as candidaturas no `localStorage` do navegador e mostra um aviso amarelo.
 
 ---
 
@@ -38,8 +42,8 @@ Se o `config.js` estiver sem as chaves, a página salva tudo no `localStorage` d
 
 | Arquivo | Papel |
 |---|---|
-| `vagas/oportunidade.html` | Camada de dados (`api.listarVagas`, `api.criarVaga`, `api.candidatar`). |
-| `supabase/schema.sql` | Tabelas, validação dos campos (checks), permissões (RLS) e gatilho da data do servidor. |
+| `vagas/oportunidade.html` | Camada de dados (`api.listarVagas`, `api.candidatar`). |
+| `supabase/schema.sql` | Tabelas, validação dos campos (checks), permissões (RLS) e gatilho da data do servidor. Vale também para o que o CDLOAD gravar (os checks são do banco). |
 | `.env.example` | Modelo das variáveis do Supabase. |
 | `scripts/gerar_config.ps1` / `.py` | Geram o `config.js`. Recusam chave secret / service_role. |
 | `config.js` | URL e chave publishable do Supabase, lidas pela página. **Vai para o Git**, porque o GitHub Pages precisa dele. |
@@ -47,7 +51,7 @@ Se o `config.js` estiver sem as chaves, a página salva tudo no `localStorage` d
 
 ### Estrutura das tabelas
 
-**`vagas`**: o `id` é texto (as vagas migradas mantêm o ID do Firestore; as novas recebem um UUID).
+**`vagas`** (gravada pelo CDLOAD): o `id` é texto (as vagas migradas mantêm o ID do Firestore; se o CDLOAD não informar, o banco gera um UUID). Só aparecem no site as linhas com `ativa = true`.
 
 | Coluna | Tipo | Regra |
 |---|---|---|
@@ -61,8 +65,8 @@ Se o `config.js` estiver sem as chaves, a página salva tudo no `localStorage` d
 | `requisitos` | text ou null | até 1000 caracteres |
 | `beneficios` | text ou null | até 200 caracteres |
 | `whatsapp` | text | de 10 a 13 dígitos |
-| `ativa` | boolean | `true` ao criar pelo site |
-| `created_at` | timestamptz | data do servidor |
+| `ativa` | boolean | padrão `true`; `false` tira a vaga do site |
+| `created_at` | timestamptz | padrão: data do servidor |
 
 **`candidaturas`**
 
@@ -78,7 +82,7 @@ Se o `config.js` estiver sem as chaves, a página salva tudo no `localStorage` d
 | `consentimento` | boolean | precisa ser `true` |
 | `created_at` | timestamptz | data do servidor |
 
-O banco recusa colunas que não existem. Se você incluir uma nova opção em um formulário (por exemplo, um tipo de contrato), altere também o `check` correspondente no banco.
+O banco recusa colunas que não existem. Se o CDLOAD passar a usar uma nova opção (por exemplo, um tipo de contrato), altere também o `check` correspondente no banco e as listas `CONTRATOS` / `MODALIDADES` dos filtros em `vagas/oportunidade.html`.
 
 ### Pontos de atenção
 
@@ -115,8 +119,8 @@ Esses valores são públicos por natureza. Quem protege os dados são as permiss
 
 1. Abra `vagas/oportunidade.html` por um servidor local (por exemplo, o Live Server do VS Code).
 2. Confira que o aviso de "Modo demonstração" **não** aparece.
-3. Publique uma vaga e faça uma candidatura.
-4. Confira as duas linhas no **Table Editor**.
+3. Confira que as vagas ativas cadastradas pelo CDLOAD aparecem e faça uma candidatura.
+4. Confira a candidatura no **Table Editor**.
 
 Se algo falhar, veja o código de erro no console do navegador (F12):
 
@@ -137,8 +141,9 @@ Faça commit e push, incluindo o `config.js`. O GitHub Pages atualiza em 1 a 3 m
 
 ## 4. Recomendações de segurança
 
-1. **Sem login, qualquer um publica.** Como o site aceita vagas e candidaturas sem login, considere ativar **CAPTCHA** (Authentication > Attack Protection) junto com login anônimo, ou mover a gravação para uma Edge Function com verificação.
-2. **Cotas.** No plano gratuito, projetos inativos por 7 dias são pausados. Acompanhe o uso em **Reports**.
+1. **A chave secret fica só no CDLOAD**, em servidor ou variável de ambiente. Nunca no navegador nem no Git.
+2. **Candidaturas sem login.** Como o site aceita candidaturas sem login, considere ativar **CAPTCHA** (Authentication > Attack Protection) junto com login anônimo, ou mover a gravação para uma Edge Function com verificação.
+3. **Cotas.** No plano gratuito, projetos inativos por 7 dias são pausados. Acompanhe o uso em **Reports**.
 
 ---
 
@@ -147,8 +152,7 @@ Faça commit e push, incluindo o `config.js`. O GitHub Pages atualiza em 1 a 3 m
 | Tarefa | Onde |
 |---|---|
 | Ver candidaturas | Table Editor > `candidaturas` (o `vaga_id` é o `id` da vaga) |
-| Tirar uma vaga do ar | Table Editor > `vagas` > mude `ativa` para `false` |
-| Corrigir dados de uma vaga | Edite a linha no Table Editor. O site não permite alteração. |
+| Cadastrar, corrigir ou tirar uma vaga do ar | Projeto **CDLOAD** (em emergência: Table Editor > `vagas`, `ativa = false`) |
 | Mudar validações ou permissões | Edite `supabase/schema.sql` e rode de novo no SQL Editor |
 
 ---
