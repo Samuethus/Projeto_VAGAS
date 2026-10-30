@@ -92,11 +92,13 @@
   .logo-cdl img{height:100%; width:auto; max-width:none; display:block; margin-left:calc(var(--h) * var(--ar) * -.5964);}
 
   /* ---------- Cabeçalho ---------- */
-  /* Faixa única: marca à esquerda; à direita, redes sociais e, no fim, a chamada de solicitação. Separada do conteúdo por uma linha fina. */
+  /* Faixa única: marca à esquerda, redes sociais no centro da tela e a chamada de solicitação à direita. Separada do conteúdo por uma linha fina.
+     Grade 1fr | auto | 1fr: as laterais têm a mesma largura, então os ícones ficam no centro exato. */
   .topo{position:sticky; top:0; z-index:50; padding:0; background:var(--branco); border-bottom:1px solid var(--borda); transition:background .2s ease, box-shadow .2s ease;}
   .topo.rolou{background:rgba(255,255,255,.86); backdrop-filter:blur(12px); box-shadow:0 8px 24px -18px rgba(2,43,83,.35);}
-  .topo .container{display:flex; align-items:center; justify-content:space-between; gap:20px; height:72px;}
-  .topo-acoes{display:flex; align-items:center; gap:22px; margin-left:auto;}
+  .topo .container{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:20px; height:72px;}
+  .topo-acoes{display:contents;}
+  .topo-cta{justify-self:end;}
   .redes{display:flex; align-items:center; gap:4px;}
   .redes a{display:flex; width:34px; height:34px; align-items:center; justify-content:center; border-radius:50%; color:var(--azul-petroleo); transition:color .2s ease, background .2s ease;}
   .redes a:hover{color:var(--azul-royal); background:var(--fundo);}
@@ -404,8 +406,9 @@
   @media (max-width:640px){
     .marca{--h:22px; gap:10px;}
     .secao{padding:72px 0;}
-    .topo .container{height:64px;}
-    .topo-acoes{gap:8px;}
+    /* No celular não há espaço para centralizar: ícones e botão voltam a ficar juntos à direita. */
+    .topo .container{display:flex; gap:8px; height:64px;}
+    .redes{margin-left:auto;}
     .redes{gap:0;}
     .redes a{width:26px; height:26px;}
     .redes svg{width:15px; height:15px;}
