@@ -139,7 +139,7 @@
      O card do meio (foco) sobe um pouco, formando o escalonado do modelo. */
   .vcard{
     /* Recorte em pixels inteiros: medidas fracionadas deixam frestas entre as partes da máscara. */
-    --sobe:0px; --corte:round(calc(64px * var(--escala)), 1px); --curva:round(calc(16px * var(--escala)), 1px);
+    --sobe:0px; --corte:58px; --curva:14px; /* 64px e 16px × --escala (.9), já arredondados: round() não existe em navegadores de celular mais antigos e lá o card sumia. */
     position:relative; flex:0 0 calc((100% - (var(--por) - 1) * var(--gap)) / var(--por));
     transform:translateY(var(--sobe));
     transition:transform .35s cubic-bezier(.22,.7,.2,1), filter .35s ease;
@@ -484,7 +484,7 @@
             <article class="vcard">
               <a class="vcard-link" href="#servicos">
                 <div class="vcard-foto">
-                  <img src="vagas/pictures/1.webp" alt="Palestrante falando para uma plateia" loading="lazy" draggable="false">
+                  <img src="vagas/pictures/1.webp" alt="Palestrante falando para uma plateia" draggable="false">
                   <div class="vcard-texto">
                     <h3>Dicas para Recrutadores</h3>
                     <p>Orientações para aprimorar processos seletivos, identificar talentos e realizar contratações mais assertivas.</p>
@@ -497,7 +497,7 @@
             <article class="vcard">
               <a class="vcard-link" href="vagas/oportunidade.html">
                 <div class="vcard-foto">
-                  <img src="vagas/pictures/2.jpg" alt="Aperto de mãos ao fundo e contrato sobre a mesa" loading="lazy" draggable="false">
+                  <img src="vagas/pictures/2.jpg" alt="Aperto de mãos ao fundo e contrato sobre a mesa" draggable="false">
                   <div class="vcard-texto">
                     <h3>Oportunidades de Emprego</h3>
                     <p>Conheça as vagas disponíveis nas empresas associadas e parceiras da CDL Cuiabá e encontre oportunidades alinhadas ao seu perfil.</p>
@@ -510,7 +510,7 @@
             <article class="vcard">
               <a class="vcard-link" href="#servicos">
                 <div class="vcard-foto">
-                  <img src="vagas/pictures/3.jfif" alt="Pessoa revisando um currículo com caneta na mão" loading="lazy" draggable="false">
+                  <img src="vagas/pictures/3.jfif" alt="Pessoa revisando um currículo com caneta na mão" draggable="false">
                   <div class="vcard-texto">
                     <h3>Dicas para Candidatos</h3>
                     <p>Saiba como preparar seu currículo, destacar suas competências e se apresentar melhor nos processos seletivos.</p>
