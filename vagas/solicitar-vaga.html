@@ -45,12 +45,13 @@
     background:var(--branco);
     color:var(--text-dark);
     -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
+    overflow-x:clip; /* clip, e não hidden: não vira contêiner de rolagem e o cabeçalho continua fixo no topo. */
   }
   a{color:inherit; text-decoration:none;}
   h1,h2,h3{font-family:'Poppins','Inter',sans-serif; font-weight:500; letter-spacing:-.02em; margin:0;}
-  /* Reserva o espaço da barra de rolagem: o cabeçalho fica na mesma posição em todas as páginas, curtas ou longas. */
-  html{scrollbar-gutter:stable;}
+  /* Barra de rolagem sempre presente: o cabeçalho fica na mesma posição em todas as páginas e a faixa branca
+     vai até a borda (scrollbar-gutter deixava uma coluna vazia à direita nas páginas que não rolam). */
+  html{overflow-y:scroll;}
   /* Mesma largura do index.html: ocupa quase toda a tela, com respiro lateral proporcional. */
   .container{width:calc(100% - clamp(32px,4vw,80px)); max-width:1840px; margin-inline:auto;}
   .destaque{background:var(--gradiente); -webkit-background-clip:text; background-clip:text; color:transparent;}
