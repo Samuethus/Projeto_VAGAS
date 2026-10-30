@@ -566,7 +566,9 @@
         console.error(erro);
         throw new Error(`Não foi possível falar com o banco de dados (${erro.code || resp.status}).`);
       }
-      return resp.status === 204 ? null : resp.json();
+      // Com return=minimal o Supabase responde 201 sem corpo: resposta vazia vira null em vez de erro de JSON.
+      const texto = await resp.text();
+      return texto ? JSON.parse(texto) : null;
     };
 
     const api = {
