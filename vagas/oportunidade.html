@@ -566,8 +566,9 @@
         console.error(erro);
         throw new Error(`Não foi possível falar com o banco de dados (${erro.code || resp.status}).`);
       }
-      // Com return=minimal o Supabase responde 201 sem corpo: resposta vazia vira null em vez de erro de JSON.
-      const texto = await resp.text();
+      // Com return=minimal a gravação já deu certo e não há o que ler: o corpo (vazio) nem é aberto.
+      if (/return=minimal/.test(opcoes.headers?.Prefer || '')) return null;
+      const texto = (await resp.text()).trim();
       return texto ? JSON.parse(texto) : null;
     };
 
