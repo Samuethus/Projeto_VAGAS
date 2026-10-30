@@ -92,25 +92,21 @@
   .logo-cdl img{height:100%; width:auto; max-width:none; display:block; margin-left:calc(var(--h) * var(--ar) * -.5964);}
 
   /* ---------- Cabeçalho ---------- */
-  /* Faixa única: marca à esquerda, redes sociais e login à direita, separada do conteúdo por uma linha fina. */
+  /* Faixa única: marca à esquerda e redes sociais encostadas à direita, separada do conteúdo por uma linha fina. */
   .topo{position:sticky; top:0; z-index:50; padding:0; background:var(--branco); border-bottom:1px solid var(--borda); transition:background .2s ease, box-shadow .2s ease;}
   .topo.rolou{background:rgba(255,255,255,.86); backdrop-filter:blur(12px); box-shadow:0 8px 24px -18px rgba(2,43,83,.35);}
   .topo .container{display:flex; align-items:center; justify-content:space-between; gap:20px; height:72px;}
-  .topo-acoes{display:flex; align-items:center; gap:22px;}
+  .topo-acoes{display:flex; align-items:center; gap:22px; margin-left:auto;}
   .redes{display:flex; align-items:center; gap:4px;}
   .redes a{display:flex; width:34px; height:34px; align-items:center; justify-content:center; border-radius:50%; color:var(--azul-petroleo); transition:color .2s ease, background .2s ease;}
   .redes a:hover{color:var(--azul-royal); background:var(--fundo);}
   .redes svg{width:17px; height:17px;}
-  .entrar{display:flex; width:42px; height:42px; align-items:center; justify-content:center; border-radius:50%;
-    background:var(--gradiente); color:#fff; box-shadow:0 10px 22px -10px rgba(0,80,162,.7); transition:transform .2s ease, box-shadow .2s ease;}
-  .entrar:hover{transform:translateY(-1px); box-shadow:0 14px 26px -10px rgba(0,80,162,.8);}
-  .entrar svg{width:20px; height:20px;}
-  .redes a:focus-visible,.entrar:focus-visible{outline:3px solid var(--azul-royal); outline-offset:2px;}
+  .redes a:focus-visible{outline:3px solid var(--azul-royal); outline-offset:2px;}
 
   /* ---------- 1. Introdução: vitrine em carrossel de três colunas ---------- */
   /* Início cabe inteiro na tela: espaçamentos e altura dos cards acompanham a altura da janela.
      --desconto é o espaço do cabeçalho, título e respiros, descontado da altura dos cards. */
-  .hero{--desconto:340px; position:relative; flex:1 0 auto; display:flex; flex-direction:column; padding:clamp(16px,4vh,40px) 0; overflow:hidden;}
+  .hero{--desconto:440px; position:relative; flex:1 0 auto; display:flex; flex-direction:column; padding:clamp(16px,4vh,40px) 0; overflow:hidden;}
   /* Os cards ficam centralizados na vertical no espaço entre o subtítulo e o aviso do rodapé. */
   .hero > .container{flex:1 0 auto; display:flex; flex-direction:column;}
   .hero-cab{text-align:center; margin:0 auto clamp(40px,6vh,56px);}
@@ -194,6 +190,19 @@
   .vitrine-pontos button:hover{background:var(--azul-petroleo);}
   .vitrine-pontos button[aria-current="true"]{background:var(--sidebar-bg); transform:scale(1.2);}
   .vitrine-pontos button:focus-visible{outline:3px solid var(--azul-royal); outline-offset:3px;}
+  /* Chamada para empresas: abre o formulário de solicitação (vagas/solicitar-vaga.html), que passa pela aprovação do RH.
+     Posicionada acima da sobra transparente da vitrine (margem negativa), para o botão continuar clicável. */
+  .hero-cta{
+    position:relative; z-index:3; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:14px 22px;
+    width:min(760px,100%); margin:clamp(28px,5vh,48px) auto 0; padding:14px 14px 14px 22px;
+    background:var(--branco); border:1px solid var(--borda); border-radius:16px; box-shadow:0 12px 30px -22px rgba(2,43,83,.45);
+  }
+  .hero-cta-texto{flex:1 1 280px; min-width:0;}
+  .hero-cta-texto b{display:block; font:600 16px 'Poppins','Inter',sans-serif; color:var(--text-dark);}
+  .hero-cta-texto span{display:block; margin-top:2px; font-size:13px; line-height:1.5; color:var(--text-muted);}
+  .hero-cta .btn{flex:0 0 auto; height:44px; padding:0 20px; font-size:14px;}
+  .hero-cta .btn svg{width:16px; height:16px;}
+  .hero-cta .btn:focus-visible{outline:3px solid var(--azul-royal); outline-offset:2px;}
   .hero-descer{display:flex; width:40px; height:40px; margin:40px auto 0; align-items:center; justify-content:center; border-radius:50%; color:var(--text-muted); transition:color .2s ease, transform .2s ease;}
   .hero-descer:hover{color:var(--azul-royal); transform:translateY(3px);}
   .hero-descer svg{width:22px; height:22px;}
@@ -386,7 +395,7 @@
 
   /* ---------- Responsivo ---------- */
   @media (max-width:1024px){
-    .hero{--desconto:400px;}
+    .hero{--desconto:500px;}
     .vitrine{--pontos:0px;}
     .vitrine-trilho{--por:2;}
     .vitrine-pontos{position:relative; right:auto; top:auto; transform:none; flex-direction:row; justify-content:center; margin-top:28px;}
@@ -406,7 +415,8 @@
     .redes{gap:0;}
     .redes a{width:26px; height:26px;}
     .redes svg{width:15px; height:15px;}
-    .entrar{width:36px; height:36px;}
+    .hero-cta{padding:16px; text-align:center;}
+    .hero-cta .btn{width:100%;}
     .vitrine-janela{padding:24px 14px 76px; margin:-24px -14px -76px;}
     .vitrine-trilho{--por:1; --gap:20px;}
     .servicos{grid-template-columns:1fr;}
@@ -438,7 +448,6 @@
         <a href="https://www.youtube.com/@CDLCuiabaoficial" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="m10 9.2 5 2.8-5 2.8z" fill="currentColor"/></svg></a>
         <a href="https://wa.me/5565996948735" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12Z"/><path d="M9 8.5c0 3.6 2.9 6.5 6.5 6.5l1-1.6-2-1-1 1a4 4 0 0 1-2.4-2.4l1-1-1-2z" fill="currentColor" stroke-width="1"/></svg></a>
       </nav>
-      <a class="entrar" href="../index.html" aria-label="Entrar" title="Entrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
     </div>
   </div>
 </header>
@@ -496,6 +505,14 @@
           </div>
         </div>
         <div class="vitrine-pontos" aria-label="Grupos de destaques"></div>
+      </div>
+
+      <div class="hero-cta revelar">
+        <p class="hero-cta-texto">
+          <b>Solicite a publicação da vaga</b>
+          <span>Sua empresa tem uma vaga aberta? Envie os dados: após conferência e aprovação do RH da CDL Cuiabá, ela é publicada e liberada para candidaturas.</span>
+        </p>
+        <a class="btn btn-primario" href="vagas/solicitar-vaga.html">Solicitar publicação <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
       </div>
 
       <a class="hero-descer oculto" href="#plataformas" aria-label="Ir para Plataformas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></a>

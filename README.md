@@ -3,7 +3,8 @@
 Portal de vagas estático (GitHub Pages). O banco de dados é o **Supabase** (Postgres).
 
 - `vagas/oportunidade.html`: listagem e candidatura às vagas.
-- **O cadastro de vagas NÃO é feito aqui**: é responsabilidade do projeto **CDLOAD**, que grava direto no Supabase.
+- `vagas/solicitar-vaga.html`: formulário público para empresas pedirem a publicação de uma vaga. A solicitação entra como **pendente** e só vira vaga depois da aprovação do RH.
+- **O site não publica vagas diretamente**: elas são gravadas pelo projeto **CDLOAD** ou pela aprovação de uma solicitação (`public.aprovar_solicitacao`).
 - `supabase/schema.sql`: tabelas, permissões e validação do banco.
 - `scripts/gerar_config.ps1`: gera o `config.js` a partir do `.env` (veja `.env.example`).
 - `scripts/migrar_firebase.ps1`: exporta as vagas do Firebase antigo para o Supabase.

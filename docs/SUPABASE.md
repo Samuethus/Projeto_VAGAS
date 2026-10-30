@@ -16,25 +16,26 @@ Navegador ──(fetch na API REST, chave publishable)──► Postgres
                          supabase/schema.sql (RLS + checks) decide o que o site pode fazer
 ```
 
-> **O cadastro de vagas não faz parte deste projeto.** As vagas são cadastradas, alteradas e desativadas pelo projeto **CDLOAD**. Este site só lista vagas e recebe candidaturas.
+> **O site não publica vagas.** As vagas são cadastradas, alteradas e desativadas pelo projeto **CDLOAD**. Empresas externas podem **solicitar** a publicação pelo formulário `vagas/solicitar-vaga.html`; a solicitação fica pendente até o RH aprovar (seção 5).
 
 | Peça | Onde |
 |---|---|
 | Acesso | `fetch` na API REST (`/rest/v1/...`), sem SDK |
 | Configuração | `config.js`, gerado do `.env` pelo script `scripts/gerar_config.ps1` |
 | Tabelas, validação e permissões | `supabase/schema.sql` |
-| Tabelas | `public.vagas` e `public.candidaturas` |
+| Tabelas | `public.vagas`, `public.candidaturas` e `public.solicitacoes_vagas` |
 
 ### Permissões
 
-- O visitante **vê** vagas ativas e **se candidata**.
+- O visitante **vê** vagas ativas, **se candidata** e **solicita a publicação** de uma vaga.
 - Ninguém cadastra, altera nem apaga vagas pelo site (o banco recusa, mesmo chamando a API direto).
-- Ninguém lê candidaturas pelo site; elas só aparecem no painel do Supabase.
-- O `created_at` da candidatura é sempre a data do servidor.
+- Ninguém lê candidaturas nem solicitações pelo site; elas só aparecem no painel do Supabase (ou no CDLOAD).
+- Toda solicitação enviada pelo site nasce `pendente`, com `created_at` do servidor, mesmo que alguém tente mandar outro status pela API.
+- As funções de aprovação (`aprovar_solicitacao`, `reprovar_solicitacao`) não podem ser chamadas pelo site.
 
 ### Modo demonstração
 
-Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as candidaturas no `localStorage` do navegador e mostra um aviso amarelo.
+Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as candidaturas e as solicitações no `localStorage` do navegador e mostra um aviso amarelo.
 
 ---
 
@@ -43,6 +44,7 @@ Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as ca
 | Arquivo | Papel |
 |---|---|
 | `vagas/oportunidade.html` | Camada de dados (`api.listarVagas`, `api.candidatar`). |
+| `vagas/solicitar-vaga.html` | Formulário de solicitação de publicação (`api.solicitar`). |
 | `supabase/schema.sql` | Tabelas, validação dos campos (checks), permissões (RLS) e gatilho da data do servidor. Vale também para o que o CDLOAD gravar (os checks são do banco). |
 | `.env.example` | Modelo das variáveis do Supabase. |
 | `scripts/gerar_config.ps1` / `.py` | Geram o `config.js`. Recusam chave secret / service_role. |
@@ -65,6 +67,8 @@ Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as ca
 | `requisitos` | text ou null | até 1000 caracteres |
 | `beneficios` | text ou null | até 200 caracteres |
 | `whatsapp` | text | de 10 a 13 dígitos |
+| `cnpj` | text ou null | 14 dígitos (preenchido quando a vaga vem de uma solicitação) |
+| `link_vaga` | text ou null | link oficial, começando com `http://` ou `https://`, até 300 caracteres |
 | `ativa` | boolean | padrão `true`; `false` tira a vaga do site |
 | `created_at` | timestamptz | padrão: data do servidor |
 
@@ -82,7 +86,22 @@ Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as ca
 | `consentimento` | boolean | precisa ser `true` |
 | `created_at` | timestamptz | data do servidor |
 
-O banco recusa colunas que não existem. Se o CDLOAD passar a usar uma nova opção (por exemplo, um tipo de contrato), altere também o `check` correspondente no banco e as listas `CONTRATOS` / `MODALIDADES` dos filtros em `vagas/oportunidade.html`.
+**`solicitacoes_vagas`** (gravada pelo formulário público): tem todas as colunas de dados de `vagas` (mesmas regras), mais:
+
+| Coluna | Tipo | Regra |
+|---|---|---|
+| `status` | text | `pendente` (sempre, ao vir do site), `aprovada` ou `reprovada` |
+| `cnpj` | text | obrigatório, 14 dígitos (o site também confere os dígitos verificadores) |
+| `responsavel` | text | obrigatório, até 100 caracteres |
+| `email_responsavel` | text ou null | até 120 caracteres |
+| `link_vaga` | text ou null | link oficial da vaga |
+| `observacao_rh` | text ou null | motivo da reprovação, até 500 caracteres |
+| `vaga_id` | text ou null | a vaga criada na aprovação |
+| `analisado_em` | timestamptz ou null | data da aprovação ou reprovação |
+
+O `whatsapp` da solicitação é o número para onde o candidato é direcionado ao finalizar a candidatura.
+
+O banco recusa colunas que não existem. Se o CDLOAD passar a usar uma nova opção (por exemplo, um tipo de contrato), altere também o `check` correspondente no banco (em `vagas` e `solicitacoes_vagas`) e as listas `CONTRATOS` / `MODALIDADES` em `vagas/oportunidade.html` e `vagas/solicitar-vaga.html`.
 
 ### Pontos de atenção
 
@@ -142,7 +161,7 @@ Faça commit e push, incluindo o `config.js`. O GitHub Pages atualiza em 1 a 3 m
 ## 4. Recomendações de segurança
 
 1. **A chave secret fica só no CDLOAD**, em servidor ou variável de ambiente. Nunca no navegador nem no Git.
-2. **Candidaturas sem login.** Como o site aceita candidaturas sem login, considere ativar **CAPTCHA** (Authentication > Attack Protection) junto com login anônimo, ou mover a gravação para uma Edge Function com verificação.
+2. **Candidaturas e solicitações sem login.** Como o site aceita candidaturas e solicitações sem login, considere ativar **CAPTCHA** (Authentication > Attack Protection) junto com login anônimo, ou mover a gravação para uma Edge Function com verificação.
 3. **Cotas.** No plano gratuito, projetos inativos por 7 dias são pausados. Acompanhe o uso em **Reports**.
 
 ---
@@ -152,8 +171,13 @@ Faça commit e push, incluindo o `config.js`. O GitHub Pages atualiza em 1 a 3 m
 | Tarefa | Onde |
 |---|---|
 | Ver candidaturas | Table Editor > `candidaturas` (o `vaga_id` é o `id` da vaga) |
+| Ver solicitações pendentes | Table Editor > `solicitacoes_vagas`, filtro `status = pendente` |
+| Aprovar uma solicitação (publica a vaga) | SQL Editor: `select public.aprovar_solicitacao('<id>');` (devolve o `id` da nova vaga) |
+| Reprovar uma solicitação | SQL Editor: `select public.reprovar_solicitacao('<id>', 'motivo');` |
 | Cadastrar, corrigir ou tirar uma vaga do ar | Projeto **CDLOAD** (em emergência: Table Editor > `vagas`, `ativa = false`) |
 | Mudar validações ou permissões | Edite `supabase/schema.sql` e rode de novo no SQL Editor |
+
+Antes de aprovar, o RH pode corrigir os dados da solicitação direto no Table Editor; a aprovação copia o que estiver gravado. O retorno à empresa (aprovada ou reprovada) é feito pelo RH, pelo WhatsApp ou e-mail informados.
 
 ---
 
