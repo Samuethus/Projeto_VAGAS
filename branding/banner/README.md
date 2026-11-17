@@ -7,7 +7,7 @@ Banner para publicação em sites parceiros, que leva o usuário à listagem de 
 | `banner-vagas.png` | 1200 × 400 px (3:1). Versão padrão para publicar. |
 | `banner-vagas@2x.png` | 2400 × 800 px. Para telas de alta densidade (retina). |
 | `banner-vagas.html` | Arquivo-fonte do banner. Edite aqui e gere os PNGs de novo. |
-| `logo-branca.png` | Logo NIM \| CDL Cuiabá em branco, usada pelo banner. |
+| `logo-branca.png` | Logo CDL Cuiabá | NIM em branco, usada pelo banner. |
 
 **Link de destino:** `https://empregoscdlcba.com.br/vagas/oportunidade.html`
 
