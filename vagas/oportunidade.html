@@ -579,12 +579,17 @@
     // Mesma regra do CDLOAD: status_validacao vazio = Aprovada; "Reprovada"/"Desativada" ficam fora do site.
     const vagaAprovada = v => v && v.ativa !== false && !String(v.status_validacao ?? '').trim();
 
+    const COLUNAS_VAGA = 'id,cargo,empresa,tipo_contrato,modalidade,local,quantidade,remuneracao,carga_horaria,inicio,termino,'
+      + 'descricao,requisitos,beneficios,whatsapp,link_vaga,ativa,status_validacao,created_at';
+
     const api = {
       async listarVagas() {
         // Só vagas APROVADAS no CDLOAD: ativa e sem status_validacao ('Reprovada' ou 'Desativada').
         // O banco já restringe (supabase/vagas_somente_aprovadas.sql); a consulta e o filtro abaixo repetem a regra.
         if (!SUPA) return [];
-        const linhas = await supa('vagas?select=*&ativa=eq.true&or=(status_validacao.is.null,status_validacao.eq.)&order=created_at.desc');
+        // Só as colunas exibidas: dados internos (aprovada_por, responsavel, email_responsavel, cnpj...) não vêm para o site.
+        // O banco também só libera essas colunas para o público (supabase/privacidade_portal.sql).
+        const linhas = await supa(`vagas?select=${COLUNAS_VAGA}&ativa=eq.true&or=(status_validacao.is.null,status_validacao.eq.)&order=created_at.desc`);
         return (linhas || []).filter(vagaAprovada);
       },
       async candidatar(candidatura) {

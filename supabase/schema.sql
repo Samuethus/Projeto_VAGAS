@@ -163,7 +163,11 @@ alter table public.candidaturas enable row level security;
 alter table public.solicitacoes_vagas enable row level security;
 
 revoke all on public.vagas, public.candidaturas, public.solicitacoes_vagas from anon, authenticated;
-grant select on public.vagas to anon, authenticated;
+grant select on public.vagas to authenticated;
+-- Público: só as colunas que o site exibe (sem aprovada_por, responsavel, email_responsavel, cnpj...). Ver privacidade_portal.sql.
+grant select (id, cargo, empresa, tipo_contrato, modalidade, local, quantidade, remuneracao, carga_horaria,
+              inicio, termino, descricao, requisitos, beneficios, whatsapp, link_vaga, ativa, status_validacao, created_at)
+  on public.vagas to anon;
 grant insert on public.candidaturas to anon, authenticated;
 grant insert on public.solicitacoes_vagas to anon, authenticated;
 

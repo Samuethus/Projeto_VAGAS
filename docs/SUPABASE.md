@@ -107,6 +107,7 @@ O banco recusa colunas que não existem. Se o CDLOAD passar a usar uma nova opç
 ### Pontos de atenção
 
 - **Uma vaga com candidaturas não pode ser apagada** (chave estrangeira). Para tirar uma vaga do ar, use **Reprovar** ou **Desativar** no CDLOAD (grava `status_validacao`) ou mude `ativa` para `false`.
+- **Privacidade:** o público só lê as colunas que o site exibe (`supabase/privacidade_portal.sql`). E-mails e dados internos (`aprovada_por`, `responsavel`, `email_responsavel`, `cnpj`, `criado_por`...) não saem do banco pela chave publishable. Coluna nova que o site precise mostrar: inclua no `grant select (...)` desse arquivo e na consulta da página.
 - **Não rode o `schema.sql` inteiro de novo** depois de instalar o CDLOAD: o `revoke all` dele apaga os privilégios do papel `authenticated` que o CDLOAD usa. Para as regras de leitura e candidatura, rode `supabase/vagas_somente_aprovadas.sql`.
 
 ---
