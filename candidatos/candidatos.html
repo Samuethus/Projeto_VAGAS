@@ -167,18 +167,21 @@
     display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden;}
 
   /* ---------- Modal: conteúdo completo (a descrição só aparece aqui) ---------- */
-  /* O fundo rola sozinho (overscroll contido): a página não perde a barra de rolagem, então nada se desloca ao abrir. */
-  .modal{position:fixed; inset:0; z-index:100; display:flex; align-items:flex-start; justify-content:center;
-    padding:clamp(16px,6vh,64px) 16px; overflow-y:auto; overscroll-behavior:contain;
+  /* A caixa cabe na tela e a rolagem acontece dentro dela (só no texto); a página não perde a barra de rolagem,
+     então nada se desloca ao abrir. */
+  .modal{position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+    padding:clamp(16px,6vh,64px) 16px; overflow:hidden;
     background:rgba(1,26,51,.6); backdrop-filter:blur(3px); opacity:0; transition:opacity .2s ease;}
   .modal[hidden]{display:none;}
   .modal.aberto{opacity:1;}
-  .modal-caixa{position:relative; width:min(720px,100%); background:var(--branco); border-radius:var(--raio); overflow:hidden;
+  .modal-caixa{position:relative; width:min(1080px,100%); max-height:100%; display:flex; flex-direction:column;
+    background:var(--branco); border-radius:var(--raio); overflow:hidden;
     box-shadow:0 30px 70px -30px rgba(1,26,51,.6); transform:translateY(12px); transition:transform .25s cubic-bezier(.22,.7,.2,1);}
   .modal.aberto .modal-caixa{transform:none;}
-  .modal-foto{display:block; width:100%; aspect-ratio:16/9; max-height:380px; object-fit:cover; background:var(--bg-panel);}
+  /* Imagem como faixa: 25% da altura da tela, fixa no topo enquanto o texto rola. */
+  .modal-foto{display:block; flex:0 0 auto; width:100%; height:25vh; height:25svh; object-fit:cover; background:var(--bg-panel);}
   .modal-foto[hidden]{display:none;}
-  .modal-corpo{padding:clamp(20px,3vw,32px);}
+  .modal-corpo{flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:clamp(20px,3vw,32px);}
   .modal-corpo h2{font-size:clamp(22px,2.4vw,28px); line-height:1.2; margin-top:14px; padding-right:40px;}
   .modal-sub{font-size:16px; line-height:1.55; color:var(--text-muted); margin-top:10px;}
   .modal-desc{font-size:15px; line-height:1.7; color:#38404b; margin-top:20px; padding-top:20px; border-top:1px solid var(--borda);
@@ -412,6 +415,7 @@
     const modal = document.getElementById('modal');
     const fecharBtn = document.getElementById('modalFechar');
     const foto = document.getElementById('modalFoto');
+    const corpo = modal.querySelector('.modal-corpo');
     let origem = null;
     const abrir = c => {
       if (!c) return;
@@ -425,7 +429,7 @@
       const desc = document.getElementById('modalDesc');
       desc.textContent = c.descricao || ''; desc.hidden = !String(c.descricao || '').trim();
       origem = document.activeElement;
-      modal.hidden = false; modal.scrollTop = 0;
+      modal.hidden = false; corpo.scrollTop = 0;
       requestAnimationFrame(() => modal.classList.add('aberto'));
       fecharBtn.focus();
     };
@@ -440,6 +444,10 @@
     });
     fecharBtn.addEventListener('click', fechar);
     modal.addEventListener('click', e => { if (e.target === modal) fechar(); });
+    // Com o modal aberto, a rolagem do mouse/toque fora do texto não rola a página ao fundo.
+    const travarFundo = e => { if (!e.target.closest('.modal-corpo')) e.preventDefault(); };
+    modal.addEventListener('wheel', travarFundo, { passive: false });
+    modal.addEventListener('touchmove', travarFundo, { passive: false });
     document.addEventListener('keydown', e => {
       if (modal.hidden) return;
       if (e.key === 'Escape') fechar();
