@@ -576,11 +576,16 @@
       return texto ? JSON.parse(texto) : null;
     };
 
+    // Mesma regra do CDLOAD: status_validacao vazio = Aprovada; "Reprovada"/"Desativada" ficam fora do site.
+    const vagaAprovada = v => v && v.ativa !== false && !String(v.status_validacao ?? '').trim();
+
     const api = {
       async listarVagas() {
-        // O banco só libera leitura de vagas ativas; o filtro deixa isso explícito.
-        if (SUPA) return supa('vagas?select=*&ativa=eq.true&order=created_at.desc');
-        return [];
+        // Só vagas APROVADAS no CDLOAD: ativa e sem status_validacao ('Reprovada' ou 'Desativada').
+        // O banco já restringe (supabase/vagas_somente_aprovadas.sql); a consulta e o filtro abaixo repetem a regra.
+        if (!SUPA) return [];
+        const linhas = await supa('vagas?select=*&ativa=eq.true&or=(status_validacao.is.null,status_validacao.eq.)&order=created_at.desc');
+        return (linhas || []).filter(vagaAprovada);
       },
       async candidatar(candidatura) {
         // return=minimal: o site não tem permissão de ler candidaturas, nem a que acabou de gravar.

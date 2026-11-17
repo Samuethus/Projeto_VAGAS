@@ -1,7 +1,10 @@
 -- Banco do portal de vagas (Supabase / Postgres): tabelas, validação dos campos e permissões (RLS).
 -- Rodar uma vez em: Supabase > SQL Editor > New query > colar tudo > Run. Pode ser rodado de novo sem perder dados.
 --
--- Visitantes (chave publishable, papel "anon") podem: ver vagas ativas, se candidatar e solicitar a publicação de uma vaga.
+-- ATENÇÃO: o CDLOAD (Projeto_CDLOAD/supabase/schema_vagas.sql) concede privilégios ao papel authenticated;
+-- o "revoke all" abaixo os apagaria. Para só ajustar as regras do site, rode supabase/vagas_somente_aprovadas.sql.
+--
+-- Visitantes (chave publishable, papel "anon") podem: ver vagas aprovadas, se candidatar e solicitar a publicação de uma vaga.
 -- Vagas são gravadas SÓ pelo projeto CDLOAD (com a chave secret, no servidor, que ignora estas permissões)
 -- ou pela aprovação de uma solicitação pelo RH (public.aprovar_solicitacao).
 -- Candidaturas e solicitações NÃO podem ser lidas pelo site: só pelo painel do Supabase (Table Editor) ou pelo CDLOAD.
@@ -46,6 +49,8 @@ create table if not exists public.candidaturas (
 -- CNPJ e link oficial vêm da solicitação aprovada; opcionais para as vagas que o CDLOAD já cadastra.
 alter table public.vagas add column if not exists cnpj text check (cnpj ~ '^[0-9]{14}$');
 alter table public.vagas add column if not exists link_vaga text check (char_length(link_vaga) <= 300 and link_vaga ~* '^https?://');
+-- Validação feita no CDLOAD: vazio = Aprovada; 'Reprovada' ou 'Desativada' tiram a vaga do site.
+alter table public.vagas add column if not exists status_validacao text;
 
 -- Fila de aprovação: empresas externas pedem a publicação pelo site (vagas/solicitar-vaga.html).
 -- O RH confere e aprova com public.aprovar_solicitacao(id), que copia a solicitação para vagas.
@@ -164,16 +169,18 @@ grant insert on public.solicitacoes_vagas to anon, authenticated;
 
 drop policy if exists "ver vagas ativas" on public.vagas;
 create policy "ver vagas ativas" on public.vagas
-  for select to anon, authenticated using (ativa);
+  for select to anon, authenticated
+  using (ativa and coalesce(btrim(status_validacao), '') = '');
 
 -- Remove a permissão de cadastro que existia quando o site publicava vagas.
 drop policy if exists "publicar vaga" on public.vagas;
 
--- Só aceita candidatura para vaga que existe e está ativa.
+-- Só aceita candidatura para vaga que existe, está ativa e foi aprovada.
 drop policy if exists "candidatar" on public.candidaturas;
 create policy "candidatar" on public.candidaturas
   for insert to anon, authenticated
-  with check (exists (select 1 from public.vagas v where v.id = vaga_id and v.ativa));
+  with check (exists (select 1 from public.vagas v
+                       where v.id = vaga_id and v.ativa and coalesce(btrim(v.status_validacao), '') = ''));
 
 -- Qualquer empresa pode pedir a publicação; ninguém lê, altera ou apaga solicitações pelo site.
 drop policy if exists "solicitar publicação" on public.solicitacoes_vagas;

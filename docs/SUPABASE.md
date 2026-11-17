@@ -53,7 +53,7 @@ Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as ca
 
 ### Estrutura das tabelas
 
-**`vagas`** (gravada pelo CDLOAD): o `id` é texto (as vagas migradas mantêm o ID do Firestore; se o CDLOAD não informar, o banco gera um UUID). Só aparecem no site as linhas com `ativa = true`.
+**`vagas`** (gravada pelo CDLOAD): o `id` é texto (as vagas migradas mantêm o ID do Firestore; se o CDLOAD não informar, o banco gera um UUID). Só aparecem no site as vagas **aprovadas**: `ativa = true` e `status_validacao` vazio.
 
 | Coluna | Tipo | Regra |
 |---|---|---|
@@ -70,13 +70,14 @@ Se o `config.js` estiver sem as chaves, a página não mostra vagas, salva as ca
 | `cnpj` | text ou null | 14 dígitos (preenchido quando a vaga vem de uma solicitação) |
 | `link_vaga` | text ou null | link oficial, começando com `http://` ou `https://`, até 300 caracteres |
 | `ativa` | boolean | padrão `true`; `false` tira a vaga do site |
+| `status_validacao` | text ou null | validação no CDLOAD: vazio = Aprovada; `Reprovada` ou `Desativada` tiram a vaga do site |
 | `created_at` | timestamptz | padrão: data do servidor |
 
 **`candidaturas`**
 
 | Coluna | Tipo | Regra |
 |---|---|---|
-| `vaga_id` | text | ID de uma vaga **existente e ativa** (chave estrangeira para `vagas.id`) |
+| `vaga_id` | text | ID de uma vaga **existente, ativa e aprovada** (chave estrangeira para `vagas.id`) |
 | `nome` | text | obrigatório, até 100 caracteres |
 | `whatsapp` | text | de 10 a 13 dígitos |
 | `email` | text ou null | até 120 caracteres |
@@ -105,7 +106,8 @@ O banco recusa colunas que não existem. Se o CDLOAD passar a usar uma nova opç
 
 ### Pontos de atenção
 
-- **Uma vaga com candidaturas não pode ser apagada** (chave estrangeira). Para tirar uma vaga do ar, mude `ativa` para `false`.
+- **Uma vaga com candidaturas não pode ser apagada** (chave estrangeira). Para tirar uma vaga do ar, use **Reprovar** ou **Desativar** no CDLOAD (grava `status_validacao`) ou mude `ativa` para `false`.
+- **Não rode o `schema.sql` inteiro de novo** depois de instalar o CDLOAD: o `revoke all` dele apaga os privilégios do papel `authenticated` que o CDLOAD usa. Para as regras de leitura e candidatura, rode `supabase/vagas_somente_aprovadas.sql`.
 
 ---
 
@@ -146,7 +148,7 @@ Se algo falhar, veja o código de erro no console do navegador (F12):
 | Código | Causa provável |
 |---|---|
 | `PGRST205` / `404` | As tabelas não foram criadas (rode o `schema.sql`) |
-| `42501` | Bloqueado pelas permissões (por exemplo, candidatura para vaga inativa) |
+| `42501` | Bloqueado pelas permissões (por exemplo, candidatura para vaga inativa, reprovada ou desativada) |
 | `23514` | Algum campo não passou na validação (`check`) |
 | `23503` | Candidatura para vaga que não existe |
 | `401` | Chave errada no `config.js` |
