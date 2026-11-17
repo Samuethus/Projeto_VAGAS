@@ -139,12 +139,15 @@
   }
   .faixa::-webkit-scrollbar{display:none;}
   .dica{
+    appearance:none; border:0; padding:0; margin:0; text-align:left; font:inherit; cursor:pointer;
+    display:flex; flex-direction:column; justify-content:flex-start; align-items:stretch; /* botão centraliza o conteúdo por padrão: texto no topo, como no modelo */
     position:relative; flex:0 0 clamp(240px,21vw,300px); height:clamp(320px,52vh,440px); scroll-snap-align:start;
     border-radius:var(--raio); overflow:hidden; background:var(--bg-panel); color:#fff;
     transition:transform .3s cubic-bezier(.22,.7,.2,1), box-shadow .3s ease;
   }
   .dica[hidden]{display:none;}
-  .dica:hover{transform:translateY(-4px); box-shadow:var(--sombra);}
+  .dica:focus-visible{outline:3px solid var(--azul-royal); outline-offset:3px;}
+  .dica:hover,.dica:focus-visible{transform:translateY(-4px); box-shadow:var(--sombra);}
   .dica img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;}
   /* Leitura do texto: escurece o topo da foto com o azul do rodapé (no modelo, o roxo vem de cima). */
   .dica::after{content:""; position:absolute; inset:0; pointer-events:none;
@@ -154,14 +157,39 @@
   .dica.sem-foto::after{background:linear-gradient(to bottom,rgba(1,26,51,.35) 0%,rgba(1,26,51,0) 55%);}
   .dica-icone{position:absolute; right:-18px; bottom:-18px; width:62%; aspect-ratio:1; color:rgba(255,255,255,.2);}
   .dica-icone svg{width:100%; height:100%;}
-  .dica-texto{position:relative; z-index:1; padding:clamp(16px,1.6vw,22px);}
+  .dica-texto{position:relative; z-index:1; display:block; padding:clamp(16px,1.6vw,22px);}
   .tag{
     display:inline-flex; align-items:center; height:26px; padding:0 12px; border-radius:999px;
     background:var(--amber-bg); color:#4A3700; font:600 12px 'Inter',sans-serif;
   }
-  .dica h3{font-size:clamp(17px,1.35vw,19px); line-height:1.3; margin-top:12px;}
-  .dica p{font-size:13px; line-height:1.55; color:rgba(255,255,255,.82); margin-top:8px;
+  .dica-titulo{display:block; font-family:'Poppins','Inter',sans-serif; font-weight:500; letter-spacing:-.02em; font-size:clamp(17px,1.35vw,19px); line-height:1.3; margin-top:12px;}
+  .dica-sub{font-size:13px; line-height:1.55; color:rgba(255,255,255,.82); margin-top:8px;
     display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden;}
+
+  /* ---------- Modal: conteúdo completo (a descrição só aparece aqui) ---------- */
+  /* O fundo rola sozinho (overscroll contido): a página não perde a barra de rolagem, então nada se desloca ao abrir. */
+  .modal{position:fixed; inset:0; z-index:100; display:flex; align-items:flex-start; justify-content:center;
+    padding:clamp(16px,6vh,64px) 16px; overflow-y:auto; overscroll-behavior:contain;
+    background:rgba(1,26,51,.6); backdrop-filter:blur(3px); opacity:0; transition:opacity .2s ease;}
+  .modal[hidden]{display:none;}
+  .modal.aberto{opacity:1;}
+  .modal-caixa{position:relative; width:min(720px,100%); background:var(--branco); border-radius:var(--raio); overflow:hidden;
+    box-shadow:0 30px 70px -30px rgba(1,26,51,.6); transform:translateY(12px); transition:transform .25s cubic-bezier(.22,.7,.2,1);}
+  .modal.aberto .modal-caixa{transform:none;}
+  .modal-foto{display:block; width:100%; aspect-ratio:16/9; max-height:380px; object-fit:cover; background:var(--bg-panel);}
+  .modal-foto[hidden]{display:none;}
+  .modal-corpo{padding:clamp(20px,3vw,32px);}
+  .modal-corpo h2{font-size:clamp(22px,2.4vw,28px); line-height:1.2; margin-top:14px; padding-right:40px;}
+  .modal-sub{font-size:16px; line-height:1.55; color:var(--text-muted); margin-top:10px;}
+  .modal-desc{font-size:15px; line-height:1.7; color:#38404b; margin-top:20px; padding-top:20px; border-top:1px solid var(--borda);
+    white-space:pre-line; overflow-wrap:anywhere;}
+  .modal-sub[hidden],.modal-desc[hidden]{display:none;}
+  .modal-fechar{position:absolute; top:12px; right:12px; z-index:1; width:40px; height:40px; border-radius:50%; border:0; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.92); color:var(--sidebar-bg);
+    box-shadow:0 6px 18px rgba(2,43,83,.25); transition:transform .2s ease;}
+  .modal-fechar:hover{transform:scale(1.06);}
+  .modal-fechar:focus-visible{outline:3px solid var(--azul-royal); outline-offset:2px;}
+  .modal-fechar svg{width:18px; height:18px;}
 
   /* ---------- Aviso de direitos autorais (igual ao index.html) ---------- */
   .aviso{background:var(--branco); border-top:1px solid var(--borda);}
@@ -171,7 +199,7 @@
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     .faixa{scroll-behavior:auto;}
-    .dica{transition:none;}
+    .dica,.modal,.modal-caixa{transition:none;}
   }
 
   /* ---------- Responsivo ---------- */
@@ -249,12 +277,12 @@
       <div class="dicas-corpo">
         <aside>
           <ul class="categorias" id="categorias" aria-label="Filtrar dicas por tema">
-            <li><button type="button" data-cat="todas" aria-pressed="true">Todas<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
-            <li><button type="button" data-cat="curriculo" aria-pressed="false">Currículo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
-            <li><button type="button" data-cat="entrevista" aria-pressed="false">Entrevista<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
-            <li><button type="button" data-cat="comportamento" aria-pressed="false">Comportamento<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
-            <li><button type="button" data-cat="carreira" aria-pressed="false">Carreira<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
-            <li><button type="button" data-cat="primeiro-emprego" aria-pressed="false">Primeiro emprego<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
+            <li><button type="button" data-assunto="" aria-pressed="true">Todas<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
+            <li><button type="button" data-assunto="Currículo" aria-pressed="false">Currículo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
+            <li><button type="button" data-assunto="Entrevista" aria-pressed="false">Entrevista<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
+            <li><button type="button" data-assunto="Comportamento" aria-pressed="false">Comportamento<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
+            <li><button type="button" data-assunto="Carreira" aria-pressed="false">Carreira<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
+            <li><button type="button" data-assunto="Primeiro emprego" aria-pressed="false">Primeiro emprego<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button></li>
           </ul>
           <div class="navegar">
             <button type="button" id="voltar" aria-label="Dicas anteriores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -262,70 +290,8 @@
           </div>
         </aside>
 
-        <div class="faixa" id="faixa" tabindex="0" aria-label="Dicas para candidatos">
-          <article class="dica" data-cat="curriculo">
-            <img src="../vagas/pictures/3.jfif" alt="" loading="lazy">
-            <div class="dica-texto">
-              <span class="tag">Currículo</span>
-              <h3>Como montar um currículo objetivo e atrativo</h3>
-              <p>Organize experiências, cursos e contatos em uma página clara, com foco no que a vaga pede.</p>
-            </div>
-          </article>
-
-          <article class="dica sem-foto" data-cat="entrevista">
-            <span class="dica-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.2-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 16.5h.01"/></svg></span>
-            <div class="dica-texto">
-              <span class="tag">Entrevista</span>
-              <h3>Perguntas frequentes em entrevistas e como respondê-las</h3>
-              <p>Pense antes em exemplos reais do seu dia a dia para falar de pontos fortes, desafios e objetivos.</p>
-            </div>
-          </article>
-
-          <article class="dica" data-cat="comportamento">
-            <img src="../vagas/pictures/1.webp" alt="" loading="lazy">
-            <div class="dica-texto">
-              <span class="tag">Comportamento</span>
-              <h3>Comunicação: como se apresentar com segurança</h3>
-              <p>Postura, pontualidade e uma fala objetiva fazem diferença desde o primeiro contato.</p>
-            </div>
-          </article>
-
-          <article class="dica sem-foto" data-cat="primeiro-emprego">
-            <span class="dica-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></span>
-            <div class="dica-texto">
-              <span class="tag">Primeiro emprego</span>
-              <h3>Sem experiência? Destaque cursos e atividades</h3>
-              <p>Trabalhos voluntários, projetos da escola e cursos livres mostram iniciativa e vontade de aprender.</p>
-            </div>
-          </article>
-
-          <article class="dica" data-cat="carreira">
-            <img src="../vagas/pictures/2.jpg" alt="" loading="lazy">
-            <div class="dica-texto">
-              <span class="tag">Carreira</span>
-              <h3>Contratação: o que conferir antes de assinar</h3>
-              <p>Tipo de contrato, jornada, salário e benefícios: tire as dúvidas antes do primeiro dia.</p>
-            </div>
-          </article>
-
-          <article class="dica sem-foto" data-cat="curriculo">
-            <span class="dica-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-            <div class="dica-texto">
-              <span class="tag">Currículo</span>
-              <h3>Mensagem de apresentação para enviar pelo WhatsApp</h3>
-              <p>Cumprimente, diga qual vaga te interessa e resuma em poucas linhas por que você combina com ela.</p>
-            </div>
-          </article>
-
-          <article class="dica sem-foto" data-cat="entrevista">
-            <span class="dica-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18M8 15h3"/></svg></span>
-            <div class="dica-texto">
-              <span class="tag">Entrevista</span>
-              <h3>Checklist para o dia da entrevista</h3>
-              <p>Confirme horário e endereço, leve documentos e pesquise um pouco sobre a empresa.</p>
-            </div>
-          </article>
-        </div>
+        <!-- Preenchida com os conteúdos do Supabase (public.vagas_conteudos, categoria Candidatos), cadastrados no CDLoad › Vagas › Conteúdos. -->
+        <div class="faixa" id="faixa" tabindex="0" aria-label="Dicas para candidatos" aria-live="polite"></div>
       </div>
     </div>
   </section>
@@ -338,6 +304,22 @@
   </div>
 </footer>
 
+<!-- ============ Modal: conteúdo completo ============ -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo" hidden>
+  <div class="modal-caixa">
+    <button type="button" class="modal-fechar" id="modalFechar" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <img class="modal-foto" id="modalFoto" alt="" hidden>
+    <div class="modal-corpo">
+      <span class="tag" id="modalTag"></span>
+      <h2 id="modalTitulo"></h2>
+      <p class="modal-sub" id="modalSub"></p>
+      <div class="modal-desc" id="modalDesc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Gerado a partir do .env por scripts/gerar_config.ps1 (URL e chave publishable do Supabase). -->
+<script src="../config.js"></script>
 <script>
   // Cabeçalho com fundo ao rolar (igual ao index.html)
   const topo = document.getElementById('topo');
@@ -366,12 +348,31 @@
     if (document.fonts) document.fonts.ready.then(ajustar);
   })();
 
-  // Dicas: filtro por tema e setas que rolam a faixa de cards.
+  // Dicas: conteúdos do Supabase (public.vagas_conteudos, categoria Candidatos), filtro por assunto,
+  // setas que rolam a faixa e modal com o conteúdo completo. Sem conteúdo no assunto, a faixa fica em branco.
   (() => {
+    const cfg = window.APP_CONFIG || {};
+    const SUPA = cfg.SUPABASE_URL && cfg.SUPABASE_KEY
+      ? { url: cfg.SUPABASE_URL.replace(/\/+$/, ''), key: cfg.SUPABASE_KEY }
+      : null;
+    const CATEGORIA = 'Candidatos';
+
     const faixa = document.getElementById('faixa');
-    const cards = [...faixa.querySelectorAll('.dica')];
     const botoes = [...document.querySelectorAll('#categorias button')];
     const voltar = document.getElementById('voltar'), avancar = document.getElementById('avancar');
+    let conteudos = [], cards = [];
+
+    const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    // Só imagens por https (o bucket público do Supabase); sem imagem, o card usa o gradiente com o ícone do assunto.
+    const urlImagem = u => (/^https:\/\//i.test(String(u || '').trim()) ? String(u).trim() : '');
+    const ICONES = {
+      'Currículo': '<path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+      'Entrevista': '<path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.2-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 16.5h.01"/>',
+      'Comportamento': '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+      'Carreira': '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+      'Primeiro emprego': '<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>'
+    };
+    const icone = a => `<span class="dica-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${ICONES[a] || ICONES['Carreira']}</svg></span>`;
 
     const atualizarSetas = () => {
       const max = faixa.scrollWidth - faixa.clientWidth;
@@ -383,18 +384,91 @@
       return c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(faixa).columnGap || 0) : 300;
     };
 
-    botoes.forEach(b => b.addEventListener('click', () => {
-      const cat = b.dataset.cat;
-      botoes.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-      cards.forEach(c => { c.hidden = cat !== 'todas' && c.dataset.cat !== cat; });
+    const filtrar = () => {
+      const ativo = botoes.find(b => b.getAttribute('aria-pressed') === 'true');
+      const assunto = ativo ? ativo.dataset.assunto : '';
+      cards.forEach(c => { c.hidden = !!assunto && c.dataset.assunto !== assunto; });
       faixa.scrollTo({ left: 0, behavior: 'auto' });
       atualizarSetas();
+    };
+
+    const renderizar = () => {
+      faixa.innerHTML = conteudos.map((c, i) => {
+        const img = urlImagem(c.imagem_url);
+        return `<button type="button" class="dica${img ? '' : ' sem-foto'}" data-i="${i}" data-assunto="${esc(c.assunto)}">
+            ${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : icone(c.assunto)}
+            <span class="dica-texto">
+              <span class="tag">${esc(c.assunto)}</span>
+              <strong class="dica-titulo">${esc(c.titulo)}</strong>
+              ${c.subtitulo ? `<span class="dica-sub">${esc(c.subtitulo)}</span>` : ''}
+            </span>
+          </button>`;
+      }).join('');
+      cards = [...faixa.querySelectorAll('.dica')];
+      filtrar();
+    };
+
+    // ---------- Modal: título, subtítulo, imagem e a descrição completa ----------
+    const modal = document.getElementById('modal');
+    const fecharBtn = document.getElementById('modalFechar');
+    const foto = document.getElementById('modalFoto');
+    let origem = null;
+    const abrir = c => {
+      if (!c) return;
+      const img = urlImagem(c.imagem_url);
+      foto.hidden = !img;
+      if (img) foto.src = img; else foto.removeAttribute('src');
+      document.getElementById('modalTag').textContent = c.assunto || '';
+      document.getElementById('modalTitulo').textContent = c.titulo || '';
+      const sub = document.getElementById('modalSub');
+      sub.textContent = c.subtitulo || ''; sub.hidden = !c.subtitulo;
+      const desc = document.getElementById('modalDesc');
+      desc.textContent = c.descricao || ''; desc.hidden = !String(c.descricao || '').trim();
+      origem = document.activeElement;
+      modal.hidden = false; modal.scrollTop = 0;
+      requestAnimationFrame(() => modal.classList.add('aberto'));
+      fecharBtn.focus();
+    };
+    const fechar = () => {
+      if (modal.hidden) return;
+      modal.classList.remove('aberto'); modal.hidden = true;
+      if (origem && origem.focus) origem.focus();
+    };
+    faixa.addEventListener('click', e => {
+      const b = e.target.closest('.dica');
+      if (b) abrir(conteudos[+b.dataset.i]);
+    });
+    fecharBtn.addEventListener('click', fechar);
+    modal.addEventListener('click', e => { if (e.target === modal) fechar(); });
+    document.addEventListener('keydown', e => {
+      if (modal.hidden) return;
+      if (e.key === 'Escape') fechar();
+      // Mantém o foco dentro do modal (o único elemento focável é o botão de fechar).
+      if (e.key === 'Tab') { e.preventDefault(); fecharBtn.focus(); }
+    });
+
+    botoes.forEach(b => b.addEventListener('click', () => {
+      botoes.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      filtrar();
     }));
     voltar.addEventListener('click', () => faixa.scrollBy({ left: -passo() }));
     avancar.addEventListener('click', () => faixa.scrollBy({ left: passo() }));
     faixa.addEventListener('scroll', atualizarSetas, { passive: true });
     window.addEventListener('resize', atualizarSetas);
     atualizarSetas();
+
+    // Só as colunas exibidas: o e-mail de quem cadastrou (criado_por) não vem para o site.
+    if (SUPA) {
+      const cat = encodeURIComponent(CATEGORIA);
+      fetch(`${SUPA.url}/rest/v1/vagas_conteudos?select=id,titulo,subtitulo,descricao,categoria,assunto,imagem_url&categoria=eq.${cat}&order=created_at.desc`,
+        { headers: { apikey: SUPA.key } })
+        .then(r => { if (!r.ok) throw new Error(`Supabase ${r.status}`); return r.json(); })
+        .then(linhas => {
+          conteudos = (Array.isArray(linhas) ? linhas : []).filter(c => c && c.categoria === CATEGORIA && c.titulo);
+          renderizar();
+        })
+        .catch(e => console.error('Não foi possível carregar os conteúdos.', e));
+    }
   })();
 
   document.querySelectorAll('[data-ano]').forEach(el => { el.textContent = new Date().getFullYear(); });
