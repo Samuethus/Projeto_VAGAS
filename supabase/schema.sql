@@ -184,7 +184,7 @@ drop policy if exists "candidatar" on public.candidaturas;
 create policy "candidatar" on public.candidaturas
   for insert to anon, authenticated
   with check (exists (select 1 from public.vagas v
-                       where v.id = vaga_id and v.ativa and coalesce(btrim(v.status_validacao), '') = ''));
+                       where v.id = candidaturas.vaga_id and v.ativa and coalesce(btrim(v.status_validacao), '') = ''));
 
 -- Qualquer empresa pode pedir a publicação; ninguém lê, altera ou apaga solicitações pelo site.
 drop policy if exists "solicitar publicação" on public.solicitacoes_vagas;

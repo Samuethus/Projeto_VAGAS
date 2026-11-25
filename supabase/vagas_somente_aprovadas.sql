@@ -21,7 +21,7 @@ drop policy if exists "candidatar" on public.candidaturas;
 create policy "candidatar" on public.candidaturas
   for insert to anon, authenticated
   with check (exists (select 1 from public.vagas v
-                       where v.id = vaga_id and v.ativa and coalesce(btrim(v.status_validacao), '') = ''));
+                       where v.id = candidaturas.vaga_id and v.ativa and coalesce(btrim(v.status_validacao), '') = ''));
 
 -- Conferência: deve listar só vagas aprovadas (o SQL Editor ignora o RLS, por isso o filtro repete a regra).
 select id, cargo, empresa, status_validacao, ativa
